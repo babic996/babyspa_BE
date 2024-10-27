@@ -100,12 +100,22 @@ public class ArrangementService {
 	public FindAllArrangementDto update(UpdateArrangementDto updateArrangementDto) throws NotFoundException, Exception {
 
 		Arrangement arrangement = findById(updateArrangementDto.getArrangementId());
+		Baby baby = new Baby();
+		ServicePackage servicePackage = new ServicePackage();
 
 		// ako postoji rezervacija moze mijenjati samo status, discount i paymentType
 
-		Baby baby = babyService.findById(updateArrangementDto.getBabyId());
+		if (reservationRepository.existsByArrangement(arrangement)) {
+			baby = arrangement.getBaby();
+			servicePackage = arrangement.getServicePackage();
+			arrangement.setRemainingTerm(arrangement.getRemainingTerm());
+		} else {
+			baby = babyService.findById(updateArrangementDto.getBabyId());
+			servicePackage = servicePackageService.findById(updateArrangementDto.getServicePackageId());
+			arrangement.setRemainingTerm(servicePackage.getTermNumber());
+		}
+
 		Status status = statusService.findById(updateArrangementDto.getStatusId());
-		ServicePackage servicePackage = servicePackageService.findById(updateArrangementDto.getServicePackageId());
 
 		if (!Objects.equals(updateArrangementDto.getPaymentTypeId(), 0)
 				&& Objects.nonNull(updateArrangementDto.getPaymentTypeId())) {
@@ -136,10 +146,9 @@ public class ArrangementService {
 			arrangement.setDiscount(null);
 		}
 
-		arrangement.setNote(updateArrangementDto.getNote());
 		arrangement.setBaby(baby);
-		arrangement.setRemainingTerm(servicePackage.getTermNumber());
 		arrangement.setServicePackage(servicePackage);
+		arrangement.setNote(updateArrangementDto.getNote());
 		arrangement.setStatus(status);
 
 		arrangementRepository.save(arrangement);
