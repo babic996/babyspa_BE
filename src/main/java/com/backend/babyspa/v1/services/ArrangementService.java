@@ -212,7 +212,7 @@ public class ArrangementService {
 		ShortDetailsDto shortDetailsDto = new ShortDetailsDto();
 
 		shortDetailsDto.setId(arrangement.getArrangementId());
-		shortDetailsDto.setValue(arrangement.getBaby().getBabyName()
+		shortDetailsDto.setValue("(" + arrangement.getArrangementId() + ") " + arrangement.getBaby().getBabyName()
 				+ (Objects.nonNull(arrangement.getBaby().getBabySurname())
 						? " " + arrangement.getBaby().getBabySurname()
 						: "")
