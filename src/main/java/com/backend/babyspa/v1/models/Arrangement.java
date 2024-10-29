@@ -9,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -39,8 +38,7 @@ public class Arrangement {
 	@Column(name = "price", nullable = false)
 	private BigDecimal price;
 
-	@Lob
-	@Column(name = "note", nullable = true)
+	@Column(name = "note", columnDefinition = "TEXT", nullable = true)
 	private String note;
 
 	@ManyToOne

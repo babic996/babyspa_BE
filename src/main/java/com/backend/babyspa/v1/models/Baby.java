@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,7 +44,6 @@ public class Baby {
 	@Column(name = "mother_name", nullable = true)
 	private String motherName;
 
-	@Lob
-	@Column(name = "note", nullable = true)
+	@Column(name = "note", columnDefinition = "TEXT", nullable = true)
 	private String note;
 }
