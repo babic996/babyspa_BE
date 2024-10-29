@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.backend.babyspa.v1.dtos.CreateReservationDto;
 import com.backend.babyspa.v1.dtos.ReservationDailyReportDto;
 import com.backend.babyspa.v1.dtos.ReservationFindAllDto;
+import com.backend.babyspa.v1.dtos.ReservationShortInfo;
 import com.backend.babyspa.v1.dtos.ServicePackageDailyReportDto;
 import com.backend.babyspa.v1.dtos.UpdateReservationDto;
 import com.backend.babyspa.v1.exceptions.NotFoundException;
@@ -53,6 +54,18 @@ public class ReservationService {
 				.orElseThrow(() -> new NotFoundException("Nije pronadjena rezervacija sa id: " + reservationId + "!"));
 	}
 
+	public List<ReservationShortInfo> findByArrangementId(int arrangementId) throws NotFoundException {
+
+		Arrangement arrangement = arrangementService.findById(arrangementId);
+		List<ReservationShortInfo> reservationShortInfoList = reservationRepository.findByArrangement(arrangement)
+				.stream()
+				.map(x -> new ReservationShortInfo(x.getStartDate(), x.getEndDate(), x.getStatus().getStatusName()))
+				.collect(Collectors.toList());
+
+		return reservationShortInfoList;
+
+	}
+
 	@Transactional
 	public ReservationFindAllDto save(CreateReservationDto createReservationDto) throws NotFoundException, Exception {
 
@@ -88,11 +101,13 @@ public class ReservationService {
 		Status status = statusService.findById(updateReservationDto.getStatusId());
 		Reservation reservation = findById(updateReservationDto.getReservationId());
 
-		if (!reservation.getStatus().getStatusCode().equals(reservationCanceled)  && status.getStatusCode().equals(reservationCanceled)) {
+		if (!reservation.getStatus().getStatusCode().equals(reservationCanceled)
+				&& status.getStatusCode().equals(reservationCanceled)) {
 			arrangementService.increaseRemainingTerm(reservation.getArrangement());
-		} 
-		
-		if(reservation.getStatus().getStatusCode().equals(reservationCanceled) && !status.getStatusCode().equals(reservationCanceled)) {
+		}
+
+		if (reservation.getStatus().getStatusCode().equals(reservationCanceled)
+				&& !status.getStatusCode().equals(reservationCanceled)) {
 			arrangementService.decreaseRemainingTerm(reservation.getArrangement());
 		}
 

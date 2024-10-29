@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.babyspa.v1.dtos.CreateReservationDto;
 import com.backend.babyspa.v1.dtos.ReservationFindAllDto;
+import com.backend.babyspa.v1.dtos.ReservationShortInfo;
 import com.backend.babyspa.v1.dtos.UpdateReservationDto;
 import com.backend.babyspa.v1.models.Reservation;
 import com.backend.babyspa.v1.services.ReservationService;
@@ -38,6 +39,17 @@ public class ReservationController extends BaseController {
 
 		try {
 			return createSuccessResponse(reservationService.findById(reservationId));
+		} catch (Exception e) {
+			return createExceptionResponse(e);
+		}
+	}
+
+	@GetMapping("/find-by-arrangement-id")
+	public ResponseEntity<ApiResponse<List<ReservationShortInfo>>> findByArrangementId(
+			@RequestParam int arrangementId) {
+
+		try {
+			return createSuccessResponse(reservationService.findByArrangementId(arrangementId));
 		} catch (Exception e) {
 			return createExceptionResponse(e);
 		}
