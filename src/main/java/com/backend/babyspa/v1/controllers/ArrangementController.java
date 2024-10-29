@@ -92,10 +92,11 @@ public class ArrangementController extends BaseController {
 			@RequestParam(required = false) BigDecimal endPrice, @RequestParam(required = false) Integer statusId,
 			@RequestParam(required = false) Integer servicePackageId, @RequestParam(required = false) Integer babyId,
 			@RequestParam(required = false) Integer paymentTypeId,
-			@RequestParam(required = false) Integer remainingTerm) {
+			@RequestParam(required = false) Integer remainingTerm,
+			@RequestParam(required = false) Integer arrangementId) {
 
 		return createSuccessResponse(arrangementService.findAll(page, size, babyId, statusId, servicePackageId,
-				paymentTypeId, remainingTerm, startPrice, endPrice));
+				paymentTypeId, remainingTerm, startPrice, endPrice, arrangementId));
 	}
 
 	@GetMapping("/find-all-list")

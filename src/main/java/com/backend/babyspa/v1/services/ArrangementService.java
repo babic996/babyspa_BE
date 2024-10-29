@@ -185,12 +185,12 @@ public class ArrangementService {
 
 	public Page<FindAllArrangementDto> findAll(int page, int size, Integer babyId, Integer statusId,
 			Integer servicePackageId, Integer paymentTypeId, Integer remaingingTerm, BigDecimal startPrice,
-			BigDecimal endPrice) {
+			BigDecimal endPrice, Integer arrangementId) {
 
 		List<FindAllArrangementDto> arrangementDto = new ArrayList<FindAllArrangementDto>();
 
 		List<Arrangement> arrangement = arrangementRepository.findAllArrangementNative(statusId, babyId, paymentTypeId,
-				startPrice, endPrice, remaingingTerm, servicePackageId);
+				startPrice, endPrice, remaingingTerm, servicePackageId, arrangementId);
 
 		arrangementDto = arrangement.stream().map(x -> buildFindAllArrangementDtoFromArrangement(x))
 				.collect(Collectors.toList());

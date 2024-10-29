@@ -33,6 +33,7 @@ public interface ArrangementRepository extends JpaRepository<Arrangement, Intege
 			JOIN service_package sp ON a.service_package_id = sp.service_package_id
 			WHERE (:statusId IS NULL OR s.status_id = :statusId)
 			AND (:babyId IS NULL OR b.baby_id = :babyId)
+			AND (:arrangementId IS NULL OR a.arrangement_id = :arrangementId)
 			AND (:paymentTypeId IS NULL OR pt.payment_type_id = :paymentTypeId)
 			AND (:servicePackageId IS NULL OR sp.service_package_id = :servicePackageId)
 			AND (:startPrice IS NULL OR :endPrice IS NULL OR a.price BETWEEN :startPrice AND :endPrice)
@@ -42,5 +43,5 @@ public interface ArrangementRepository extends JpaRepository<Arrangement, Intege
 	List<Arrangement> findAllArrangementNative(@Param("statusId") Integer statusId, @Param("babyId") Integer babyId,
 			@Param("paymentTypeId") Integer paymentTypeId, @Param("startPrice") BigDecimal startPrice,
 			@Param("endPrice") BigDecimal endPrice, @Param("remainingTerm") Integer remainingTerm,
-			@Param("servicePackageId") Integer servicePackageId);
+			@Param("servicePackageId") Integer servicePackageId, @Param("arrangementId") Integer arrangementId);
 }
