@@ -111,7 +111,7 @@ public class ReservationService {
 				&& reservation.getArrangement().getRemainingTerm() == 0
 				&& !status.getStatusCode().equals(reservationCanceled)) {
 			throw new Exception(
-					"Nije moguće ažurirati rezervaciju jer bi broj preostalih termina aranžmana bio manji od 0");
+					"Nije moguće ažurirati rezervaciju jer bi broj preostalih termina aranžmana bio manji od 0!");
 		} else {
 			if (!reservation.getStatus().getStatusCode().equals(reservationCanceled)
 					&& status.getStatusCode().equals(reservationCanceled)) {
