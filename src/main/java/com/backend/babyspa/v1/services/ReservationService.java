@@ -107,17 +107,24 @@ public class ReservationService {
 		Status status = statusService.findById(updateReservationDto.getStatusId());
 		Reservation reservation = findById(updateReservationDto.getReservationId());
 
-		if (!reservation.getStatus().getStatusCode().equals(reservationCanceled)
-				&& status.getStatusCode().equals(reservationCanceled)) {
-			arrangementService.increaseRemainingTerm(reservation.getArrangement());
-		}
-
 		if (reservation.getStatus().getStatusCode().equals(reservationCanceled)
+				&& reservation.getArrangement().getRemainingTerm() == 0
 				&& !status.getStatusCode().equals(reservationCanceled)) {
-			arrangementService.decreaseRemainingTerm(reservation.getArrangement());
+			throw new Exception(
+					"Nije moguće ažurirati rezervaciju jer bi broj preostalih termina aranžmana bio manji od 0");
+		} else {
+			if (!reservation.getStatus().getStatusCode().equals(reservationCanceled)
+					&& status.getStatusCode().equals(reservationCanceled)) {
+				arrangementService.increaseRemainingTerm(reservation.getArrangement());
+			}
+
+			if (reservation.getStatus().getStatusCode().equals(reservationCanceled)
+					&& !status.getStatusCode().equals(reservationCanceled)) {
+				arrangementService.decreaseRemainingTerm(reservation.getArrangement());
+			}
+			reservation.setStatus(status);
 		}
 
-		reservation.setStatus(status);
 		reservation.setNote(updateReservationDto.getNote());
 
 		reservationRepository.save(reservation);
