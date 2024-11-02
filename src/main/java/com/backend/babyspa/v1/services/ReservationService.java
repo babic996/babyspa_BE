@@ -77,10 +77,16 @@ public class ReservationService {
 			throw new Exception("Nije moguće napraviti rezervaciju jer je iskorišten maksimalan broj termina!");
 		}
 
-		if (reservationRepository.existsByArrangement(arrangement) && (createReservationDto.getStartDate()
-				.plusDays(arrangement.getServicePackage().getServicePackageDurationDays())
-				.isBefore(createReservationDto.getStartDate()))) {
-			throw new Exception("Nije moguće napraviti rezervaciju jer je broj dana koliko traje paket istekao!");
+		if (reservationRepository.existsByArrangement(arrangement)) {
+			Reservation firstReservation = reservationRepository
+					.findFirstByArrangementOrderByReservationIdAsc(arrangement)
+					.orElseThrow(() -> new Exception("Nije pronađena prva rezervacija za aranžman čiji je Id: "
+							+ arrangement.getArrangementId() + "!"));
+			if ((firstReservation.getStartDate()
+					.plusDays(arrangement.getServicePackage().getServicePackageDurationDays())
+					.isBefore(createReservationDto.getStartDate()))) {
+				throw new Exception("Nije moguće napraviti rezervaciju jer je broj dana koliko traje paket istekao!");
+			}
 		}
 
 		reservation.setArrangement(arrangement);

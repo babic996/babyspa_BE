@@ -183,6 +183,12 @@ public class ArrangementService {
 		return arrangementId;
 	}
 
+	public boolean existsByServicePackage(int servicePackageId) {
+		ServicePackage servicePackage = servicePackageService.findById(servicePackageId);
+
+		return arrangementRepository.existsByServicePackage(servicePackage);
+	}
+
 	public Page<FindAllArrangementDto> findAll(int page, int size, Integer babyId, Integer statusId,
 			Integer servicePackageId, Integer paymentTypeId, Integer remaingingTerm, BigDecimal startPrice,
 			BigDecimal endPrice, Integer arrangementId) {

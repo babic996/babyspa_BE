@@ -3,6 +3,7 @@ package com.backend.babyspa.v1.repositories;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,8 @@ import com.backend.babyspa.v1.projections.LocalDateProjection;
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
 
 	boolean existsByArrangement(Arrangement arrangement);
+
+	Optional<Reservation> findFirstByArrangementOrderByReservationIdAsc(Arrangement arrangement);
 
 	List<Reservation> findByArrangement(Arrangement arrangement);
 

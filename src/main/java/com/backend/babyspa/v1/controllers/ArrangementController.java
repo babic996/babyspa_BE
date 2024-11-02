@@ -43,6 +43,16 @@ public class ArrangementController extends BaseController {
 		}
 	}
 
+	@GetMapping("/exists-by-service-package-id")
+	public ResponseEntity<ApiResponse<Boolean>> existsByServicePackageId(@RequestParam int servicePackageId) {
+
+		try {
+			return createSuccessResponse(arrangementService.existsByServicePackage(servicePackageId));
+		} catch (Exception e) {
+			return createExceptionResponse(e);
+		}
+	}
+
 	@PostMapping("/save")
 	public ResponseEntity<ApiResponse<Arrangement>> save(@RequestBody @Valid CreateArrangementDto createReservationDto,
 			BindingResult bindingResult) {

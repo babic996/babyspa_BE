@@ -63,10 +63,13 @@ public class ServicePackageService {
 					"Postoji paket usluge sa imenom: " + updateServicePackageDto.getServicePackageName() + "!");
 		}
 
-		servicePackage.setServicePackageName(updateServicePackageDto.getServicePackageName());
+		if (!arrangementRepository.existsByServicePackage(servicePackage)) {
+			servicePackage.setServicePackageName(updateServicePackageDto.getServicePackageName());
+			servicePackage.setServicePackageDurationDays(updateServicePackageDto.getServicePackageDurationDays());
+			servicePackage.setTermNumber(updateServicePackageDto.getTermNumber());
+		}
+
 		servicePackage.setPrice(updateServicePackageDto.getPrice());
-		servicePackage.setServicePackageDurationDays(updateServicePackageDto.getServicePackageDurationDays());
-		servicePackage.setTermNumber(updateServicePackageDto.getTermNumber());
 		servicePackage.setNote(updateServicePackageDto.getNote());
 
 		return servicePackageRepository.save(servicePackage);
