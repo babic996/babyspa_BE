@@ -19,4 +19,10 @@ public class DailyReportScheduler {
 //		reservationService.generateReservationReport();
 //		reservationService.generateServicePackageReport();
 	}
+
+	@Scheduled(cron = "0 0 8,9,10,11,12 * * *", zone = "Europe/Belgrade")
+	public void updateReservationStatusDayBefore() {
+		reservationService.updateReservationWithStatusCreatedToStatusUsed();
+	}
+
 }

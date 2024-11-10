@@ -1,6 +1,7 @@
 package com.backend.babyspa.v1.services;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ public class ReservationService {
 	ServicePackageDailyReportService servicePackageDailyReportService;
 
 	private final String reservationReserved = "term_reserved";
+	private final String reservationUsed = "term_used";
 	private final String reservationCanceled = "term_canceled";
 	private final String reservationStatusType = "reservation";
 
@@ -188,6 +190,22 @@ public class ReservationService {
 			});
 		}
 
+	}
+
+	@Transactional
+	public void updateReservationWithStatusCreatedToStatusUsed() {
+
+		LocalDateTime dayBefore = LocalDateTime.now().minusDays(1);
+		Status statusReservationReserved = statusService.findByStatusCode(reservationReserved);
+		Status statusReservationUsed = statusService.findByStatusCode(reservationUsed);
+
+		reservationRepository.findByStartDateAndStatusCode(dayBefore, statusReservationReserved.getStatusId()).stream()
+				.forEach(reservation -> updateReservationStatus(reservation, statusReservationUsed));
+	}
+
+	private void updateReservationStatus(Reservation reservation, Status status) {
+		reservation.setStatus(status);
+		reservationRepository.save(reservation);
 	}
 
 	public void generateServicePackageReport(LocalDate date) {

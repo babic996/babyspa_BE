@@ -23,6 +23,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
 	List<Reservation> findByArrangement(Arrangement arrangement);
 
+	@Query(value = "SELECT * FROM reservation r WHERE DATE(r.start_date) = :dayBefore AND r.status_id = :statusId", nativeQuery = true)
+	List<Reservation> findByStartDateAndStatusCode(LocalDateTime dayBefore, int statusId);
+
 	void deleteByArrangement(Arrangement arrangement);
 
 	@Query(value = "SELECT COUNT(r) FROM reservation r WHERE DATE(r.start_date) = :currentDate AND r.status_id = :statusId", nativeQuery = true)
