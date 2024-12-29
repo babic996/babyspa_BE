@@ -21,6 +21,8 @@ public class UpdateArrangementDto {
 
 	private String note;
 
+	private Integer extendDurationDays;
+
 	@NotNull(message = "Morate bebu za koju pravi aranzman")
 	private int babyId;
 

@@ -1,10 +1,12 @@
 package com.backend.babyspa.v1.controllers;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -103,10 +105,27 @@ public class ArrangementController extends BaseController {
 			@RequestParam(required = false) Integer servicePackageId, @RequestParam(required = false) Integer babyId,
 			@RequestParam(required = false) Integer paymentTypeId,
 			@RequestParam(required = false) Integer remainingTerm,
-			@RequestParam(required = false) Integer arrangementId) {
+			@RequestParam(required = false) Integer arrangementId,
+			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam(required = false) LocalDateTime startRangeDate,
+			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam(required = false) LocalDateTime endRangeDate) {
 
 		return createSuccessResponse(arrangementService.findAll(page, size, babyId, statusId, servicePackageId,
-				paymentTypeId, remainingTerm, startPrice, endPrice, arrangementId));
+				paymentTypeId, remainingTerm, startPrice, endPrice, arrangementId, startRangeDate, endRangeDate));
+	}
+
+	@GetMapping("/find-price")
+	public ResponseEntity<ApiResponse<BigDecimal>> findTotalSum(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size, @RequestParam(required = false) BigDecimal startPrice,
+			@RequestParam(required = false) BigDecimal endPrice, @RequestParam(required = false) Integer statusId,
+			@RequestParam(required = false) Integer servicePackageId, @RequestParam(required = false) Integer babyId,
+			@RequestParam(required = false) Integer paymentTypeId,
+			@RequestParam(required = false) Integer remainingTerm,
+			@RequestParam(required = false) Integer arrangementId,
+			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam(required = false) LocalDateTime startRangeDate,
+			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam(required = false) LocalDateTime endRangeDate) {
+
+		return createSuccessResponse(arrangementService.findTotalSum(babyId, statusId, servicePackageId, paymentTypeId,
+				remainingTerm, startPrice, endPrice, arrangementId, startRangeDate, endRangeDate));
 	}
 
 	@GetMapping("/find-all-list")

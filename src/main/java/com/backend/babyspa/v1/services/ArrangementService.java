@@ -1,6 +1,7 @@
 package com.backend.babyspa.v1.services;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +27,7 @@ import com.backend.babyspa.v1.models.ServicePackage;
 import com.backend.babyspa.v1.models.Status;
 import com.backend.babyspa.v1.repositories.ArrangementRepository;
 import com.backend.babyspa.v1.repositories.ReservationRepository;
+import com.backend.babyspa.v1.utils.DateTimeUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -150,6 +152,7 @@ public class ArrangementService {
 		arrangement.setServicePackage(servicePackage);
 		arrangement.setNote(updateArrangementDto.getNote());
 		arrangement.setStatus(status);
+		arrangement.setExtendDurationDays(updateArrangementDto.getExtendDurationDays());
 
 		arrangementRepository.save(arrangement);
 		return buildFindAllArrangementDtoFromArrangement(arrangement);
@@ -191,12 +194,25 @@ public class ArrangementService {
 
 	public Page<FindAllArrangementDto> findAll(int page, int size, Integer babyId, Integer statusId,
 			Integer servicePackageId, Integer paymentTypeId, Integer remaingingTerm, BigDecimal startPrice,
-			BigDecimal endPrice, Integer arrangementId) {
+			BigDecimal endPrice, Integer arrangementId, LocalDateTime startDate, LocalDateTime endDate) {
 
 		List<FindAllArrangementDto> arrangementDto = new ArrayList<FindAllArrangementDto>();
+		List<Arrangement> arrangement = new ArrayList<Arrangement>();
 
-		List<Arrangement> arrangement = arrangementRepository.findAllArrangementNative(statusId, babyId, paymentTypeId,
-				startPrice, endPrice, remaingingTerm, servicePackageId, arrangementId);
+		if (Objects.isNull(startDate) && Objects.nonNull(endDate)) {
+			startDate = DateTimeUtil.getDateTimeFromString("1999-01-01 00:00:00");
+		} else if (Objects.nonNull(startDate) && Objects.isNull(endDate)) {
+			endDate = LocalDateTime.now().plusMinutes(15);
+		}
+
+		if (Objects.isNull(startDate) && Objects.isNull(endDate)) {
+			arrangement = arrangementRepository.findAllArrangementNative(statusId, babyId, paymentTypeId, startPrice,
+					endPrice, remaingingTerm, servicePackageId, arrangementId);
+		} else {
+			arrangement = arrangementRepository.findAllArrangementNativeWithStartDateAndDate(statusId, babyId,
+					paymentTypeId, startPrice, endPrice, remaingingTerm, servicePackageId, arrangementId, startDate,
+					endDate);
+		}
 
 		arrangementDto = arrangement.stream().map(x -> buildFindAllArrangementDtoFromArrangement(x))
 				.collect(Collectors.toList());
@@ -212,6 +228,30 @@ public class ArrangementService {
 				arrangementDto.size());
 
 		return pageItem;
+	}
+
+	public BigDecimal findTotalSum(Integer babyId, Integer statusId, Integer servicePackageId, Integer paymentTypeId,
+			Integer remaingingTerm, BigDecimal startPrice, BigDecimal endPrice, Integer arrangementId,
+			LocalDateTime startDate, LocalDateTime endDate) {
+
+		if (Objects.isNull(startDate) && Objects.nonNull(endDate)) {
+			startDate = DateTimeUtil.getDateTimeFromString("1999-01-01 00:00:00");
+		} else if (Objects.nonNull(startDate) && Objects.isNull(endDate)) {
+			endDate = LocalDateTime.now().plusMinutes(15);
+		}
+
+		BigDecimal price;
+
+		if (Objects.isNull(startDate) && Objects.isNull(endDate)) {
+			price = arrangementRepository.findPriceForAllArrangementNative(statusId, babyId, paymentTypeId, startPrice,
+					endPrice, remaingingTerm, servicePackageId, arrangementId);
+		} else {
+			price = arrangementRepository.findPriceForAllArrangementNativeWithStartDateAndDate(statusId, babyId,
+					paymentTypeId, startPrice, endPrice, remaingingTerm, servicePackageId, arrangementId, startDate,
+					endDate);
+		}
+
+		return price;
 	}
 
 	public List<ShortDetailsDto> findAllArrangementList() {
@@ -268,6 +308,7 @@ public class ArrangementService {
 			findAllArrangementDto.setPaymentType(new ShortDetailsDto(arrangement.getPaymentType().getPaymentTypeId(),
 					arrangement.getPaymentType().getPaymentTypeName()));
 		}
+		findAllArrangementDto.setExtendDurationDays(arrangement.getExtendDurationDays());
 
 		return findAllArrangementDto;
 	}

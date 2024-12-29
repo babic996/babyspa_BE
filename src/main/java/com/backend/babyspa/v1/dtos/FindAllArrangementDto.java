@@ -17,6 +17,7 @@ public class FindAllArrangementDto {
 	private int arrangementId;
 	private LocalDateTime createdAt;
 	private int remainingTerm;
+	private Integer extendDurationDays;
 	private BigDecimal price;
 	private String note;
 	private ShortDetailsDto discount;

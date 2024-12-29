@@ -84,8 +84,9 @@ public class ReservationService {
 					.findFirstByArrangementOrderByReservationIdAsc(arrangement)
 					.orElseThrow(() -> new Exception("Nije pronađena prva rezervacija za aranžman čiji je Id: "
 							+ arrangement.getArrangementId() + "!"));
-			if ((firstReservation.getStartDate()
-					.plusDays(arrangement.getServicePackage().getServicePackageDurationDays())
+			if ((firstReservation.getStartDate().plusDays(arrangement.getServicePackage()
+					.getServicePackageDurationDays()
+					+ (Objects.nonNull(arrangement.getExtendDurationDays()) ? arrangement.getExtendDurationDays() : 0))
 					.isBefore(createReservationDto.getStartDate()))) {
 				throw new Exception("Nije moguće napraviti rezervaciju jer je broj dana koliko traje paket istekao!");
 			}

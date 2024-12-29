@@ -35,6 +35,9 @@ public class Arrangement {
 	@Column(name = "remaining_term", nullable = false)
 	private int remainingTerm;
 
+	@Column(name = "extend_duration_days", nullable = true)
+	private Integer extendDurationDays;
+
 	@Column(name = "price", nullable = false)
 	private BigDecimal price;
 
