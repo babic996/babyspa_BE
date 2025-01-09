@@ -77,7 +77,8 @@ public class WebSecurityConfiguration {
 						.requestMatchers(reservationURLs).hasAnyRole("RESERVATION_MAINTAINER", "ADMIN", "SUPER_ADMIN")
 						.requestMatchers(arrangementURLs).hasAnyRole("ARRANGEMENT_MAINTAINER", "ADMIN", "SUPER_ADMIN")
 						.requestMatchers(reportURLs).hasAnyRole("REPORT_OVERVIEW", "ADMIN", "SUPER_ADMIN")
-						.requestMatchers(babyURLs).hasAnyRole("BABY_MAINTAINER").anyRequest().authenticated())
+						.requestMatchers(babyURLs).hasAnyRole("BABY_MAINTAINER", "ADMIN", "SUPER_ADMIN").anyRequest()
+						.authenticated())
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
