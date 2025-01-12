@@ -12,15 +12,12 @@ public class DailyReportScheduler {
 	@Autowired
 	ReservationService reservationService;
 
-	@Scheduled(cron = "00 59 23 * * *", zone = "Europe/Belgrade")
+	@Scheduled(cron = "00 59 23 * * *", zone = "Europe/Sarajevo")
 	public void generateReports() {
-//		da se aplikacija vrti na serveru ovako bih generisao izvjestaje
-// 		generisao bih svaki dan izvjestaj za taj dan
-//		reservationService.generateReservationReport();
-//		reservationService.generateServicePackageReport();
+		reservationService.generateReportForAllDateInReservation(true, null);
 	}
 
-	@Scheduled(cron = "0 0 8,9,10,11,12 * * *", zone = "Europe/Belgrade")
+	@Scheduled(cron = "0 0 1 * * *", zone = "Europe/Sarajevo")
 	public void updateReservationStatusDayBefore() {
 		reservationService.updateReservationWithStatusCreatedToStatusUsed();
 	}

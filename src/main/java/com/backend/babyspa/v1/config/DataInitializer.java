@@ -3,21 +3,22 @@ package com.backend.babyspa.v1.config;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.backend.babyspa.v1.models.Discount;
 import com.backend.babyspa.v1.models.PaymentType;
+import com.backend.babyspa.v1.models.Role;
 import com.backend.babyspa.v1.models.Status;
 import com.backend.babyspa.v1.models.StatusType;
 import com.backend.babyspa.v1.repositories.DiscountRepository;
 import com.backend.babyspa.v1.repositories.PaymentTypeRepository;
+import com.backend.babyspa.v1.repositories.RoleRepository;
 import com.backend.babyspa.v1.repositories.StatusRepository;
 import com.backend.babyspa.v1.repositories.StatusTypeRepository;
 
-import jakarta.annotation.PostConstruct;
-
 @Component
-public class DataInitializer {
+public class DataInitializer implements CommandLineRunner {
 
 	@Autowired
 	StatusRepository statusRepository;
@@ -31,9 +32,11 @@ public class DataInitializer {
 	@Autowired
 	PaymentTypeRepository paymentTypeRepository;
 
-	@PostConstruct
-	public void init() {
+	@Autowired
+	RoleRepository roleRepository;
 
+	@Override
+	public void run(String... args) throws Exception {
 		if (statusTypeRepository.count() == 0) {
 			statusTypeRepository.save(new StatusType("reservation"));
 			statusTypeRepository.save(new StatusType("arrangement"));
@@ -62,6 +65,7 @@ public class DataInitializer {
 			discountRepository.save(new Discount(BigDecimal.valueOf(50), false, "50KM"));
 			discountRepository.save(new Discount(BigDecimal.valueOf(20), true, "20%"));
 			discountRepository.save(new Discount(BigDecimal.valueOf(30), true, "30%"));
+			discountRepository.save(new Discount(BigDecimal.valueOf(40), true, "40%"));
 			discountRepository.save(new Discount(BigDecimal.valueOf(50), true, "50%"));
 		}
 
@@ -70,5 +74,16 @@ public class DataInitializer {
 			paymentTypeRepository.save(new PaymentType("Poklon bon", "gift"));
 		}
 
+		if (roleRepository.count() == 0) {
+			roleRepository.save(new Role("ROLE_SUPER_ADMIN"));
+			roleRepository.save(new Role("ROLE_ADMIN"));
+			roleRepository.save(new Role("ROLE_RESERVATION_MAINTAINER"));
+			roleRepository.save(new Role("ROLE_ARRANGEMENT_MAINTAINER"));
+			roleRepository.save(new Role("ROLE_BABY_MAINTAINER"));
+			roleRepository.save(new Role("ROLE_SERVICE_PACKAGE_MAINTAINER"));
+			roleRepository.save(new Role("ROLE_REPORT_OVERVIEW"));
+		}
+
 	}
+
 }

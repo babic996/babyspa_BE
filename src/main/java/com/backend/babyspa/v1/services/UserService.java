@@ -14,8 +14,13 @@ import com.backend.babyspa.v1.config.UserDetailsServiceImpl;
 import com.backend.babyspa.v1.dtos.LoginDto;
 import com.backend.babyspa.v1.dtos.LoginResponseDto;
 import com.backend.babyspa.v1.dtos.RegisterUserDto;
+import com.backend.babyspa.v1.models.Role;
 import com.backend.babyspa.v1.models.User;
+import com.backend.babyspa.v1.models.UserRole;
+import com.backend.babyspa.v1.models.UserRoleKey;
+import com.backend.babyspa.v1.repositories.RoleRepository;
 import com.backend.babyspa.v1.repositories.UserRepository;
+import com.backend.babyspa.v1.repositories.UserRoleRepository;
 import com.backend.babyspa.v1.utils.JwtUtil;
 
 @Service
@@ -36,9 +41,23 @@ public class UserService {
 	@Autowired
 	JwtUtil jwtUtil;
 
+	@Autowired
+	UserRoleRepository userRoleRepository;
+
+	@Autowired
+	RoleRepository roleRepository;
+
 	public User register(RegisterUserDto registerUserDto) {
 
 		User user = new User();
+
+		if (userRepository.existsByUsername(registerUserDto.getUsername())) {
+			throw new IllegalArgumentException("Username već postoji.");
+		}
+
+		if (userRepository.existsByEmail(registerUserDto.getEmail())) {
+			throw new IllegalArgumentException("Email već postoji.");
+		}
 
 		user.setEmail(registerUserDto.getEmail());
 		user.setFirstName(registerUserDto.getFirstName());
@@ -46,7 +65,19 @@ public class UserService {
 		user.setUsername(registerUserDto.getUsername());
 		user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
 
-		return userRepository.save(user);
+		userRepository.save(user);
+
+		// kreiramo prvog usera i njemu dodijeljujemo rolu super_admin
+		if (userRepository.count() == 1) {
+			Role role = roleRepository.findByRoleName("ROLE_SUPER_ADMIN");
+			UserRole userRole = new UserRole();
+			userRole.setRole(role);
+			userRole.setUser(user);
+			userRole.setUserRoleKey(new UserRoleKey(user.getUserId(), role.getRoleId()));
+			userRoleRepository.save(userRole);
+		}
+
+		return user;
 	}
 
 	public LoginResponseDto loginUser(LoginDto loginDto) throws BadCredentialsException {
