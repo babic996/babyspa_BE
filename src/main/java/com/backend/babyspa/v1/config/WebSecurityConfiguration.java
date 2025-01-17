@@ -27,7 +27,7 @@ public class WebSecurityConfiguration {
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
 
-	private static final String[] permitAllURLs = { "/user/register", "/user/login" };
+	private static final String[] permitAllURLs = { "/user/login" };
 
 	private static final String[] reportURLs = { "/service-package-daily-report/find-all",
 			"/reservation-daily-report/find-all" };
@@ -43,6 +43,7 @@ public class WebSecurityConfiguration {
 	private static final String[] reservationURLs = { "/reservation/find-by-id", "/reservation/find-all",
 			"/reservation/save", "/reservation/update", "/reservation/delete", "/reservation/find-by-arrangement-id",
 			"/reservation/canceled", "/status/find-all-status-type-code", "/arrangement/find-all-list" };
+	private static final String[] superAdminURLs = { "/user/register", "/user/assign-roles" };
 
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -77,8 +78,8 @@ public class WebSecurityConfiguration {
 						.requestMatchers(reservationURLs).hasAnyRole("RESERVATION_MAINTAINER", "ADMIN", "SUPER_ADMIN")
 						.requestMatchers(arrangementURLs).hasAnyRole("ARRANGEMENT_MAINTAINER", "ADMIN", "SUPER_ADMIN")
 						.requestMatchers(reportURLs).hasAnyRole("REPORT_OVERVIEW", "ADMIN", "SUPER_ADMIN")
-						.requestMatchers(babyURLs).hasAnyRole("BABY_MAINTAINER", "ADMIN", "SUPER_ADMIN").anyRequest()
-						.authenticated())
+						.requestMatchers(superAdminURLs).hasRole("SUPER_ADMIN").requestMatchers(babyURLs)
+						.hasAnyRole("BABY_MAINTAINER", "ADMIN", "SUPER_ADMIN").anyRequest().authenticated())
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}

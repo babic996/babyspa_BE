@@ -4,18 +4,25 @@ import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.backend.babyspa.v1.exceptions.NotFoundException;
 import com.backend.babyspa.v1.models.Discount;
 import com.backend.babyspa.v1.models.PaymentType;
 import com.backend.babyspa.v1.models.Role;
 import com.backend.babyspa.v1.models.Status;
 import com.backend.babyspa.v1.models.StatusType;
+import com.backend.babyspa.v1.models.User;
+import com.backend.babyspa.v1.models.UserRole;
+import com.backend.babyspa.v1.models.UserRoleKey;
 import com.backend.babyspa.v1.repositories.DiscountRepository;
 import com.backend.babyspa.v1.repositories.PaymentTypeRepository;
 import com.backend.babyspa.v1.repositories.RoleRepository;
 import com.backend.babyspa.v1.repositories.StatusRepository;
 import com.backend.babyspa.v1.repositories.StatusTypeRepository;
+import com.backend.babyspa.v1.repositories.UserRepository;
+import com.backend.babyspa.v1.repositories.UserRoleRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -35,8 +42,18 @@ public class DataInitializer implements CommandLineRunner {
 	@Autowired
 	RoleRepository roleRepository;
 
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	UserRoleRepository userRoleRepository;
+
+	@Autowired
+	PasswordEncoder passwordEncoder;
+
 	@Override
 	public void run(String... args) throws Exception {
+
 		if (statusTypeRepository.count() == 0) {
 			statusTypeRepository.save(new StatusType("reservation"));
 			statusTypeRepository.save(new StatusType("arrangement"));
@@ -82,6 +99,20 @@ public class DataInitializer implements CommandLineRunner {
 			roleRepository.save(new Role("ROLE_BABY_MAINTAINER"));
 			roleRepository.save(new Role("ROLE_SERVICE_PACKAGE_MAINTAINER"));
 			roleRepository.save(new Role("ROLE_REPORT_OVERVIEW"));
+		}
+
+		if (userRepository.count() == 0) {
+
+			User user = new User("user@mail", "user@sunshine", passwordEncoder.encode("user123456"), "User",
+					"Sunshine");
+			userRepository.save(user);
+			Role role = roleRepository.findByRoleName("ROLE_SUPER_ADMIN").orElseThrow(() -> new NotFoundException(
+					"Ne može se pronaći uloga SUPER_ADMIN prilikom kreiranja inicijalnog korisnika"));
+			UserRole userRole = new UserRole();
+			userRole.setRole(role);
+			userRole.setUser(user);
+			userRole.setUserRoleKey(new UserRoleKey(user.getUserId(), role.getRoleId()));
+			userRoleRepository.save(userRole);
 		}
 
 	}

@@ -7,21 +7,26 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.backend.babyspa.v1.config.UserDetailsServiceImpl;
+import com.backend.babyspa.v1.dtos.AssignRolesDto;
+import com.backend.babyspa.v1.dtos.ChangePasswordDto;
 import com.backend.babyspa.v1.dtos.LoginDto;
 import com.backend.babyspa.v1.dtos.LoginResponseDto;
 import com.backend.babyspa.v1.dtos.RegisterUserDto;
+import com.backend.babyspa.v1.exceptions.NotFoundException;
 import com.backend.babyspa.v1.models.Role;
 import com.backend.babyspa.v1.models.User;
 import com.backend.babyspa.v1.models.UserRole;
 import com.backend.babyspa.v1.models.UserRoleKey;
-import com.backend.babyspa.v1.repositories.RoleRepository;
 import com.backend.babyspa.v1.repositories.UserRepository;
 import com.backend.babyspa.v1.repositories.UserRoleRepository;
 import com.backend.babyspa.v1.utils.JwtUtil;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -45,9 +50,21 @@ public class UserService {
 	UserRoleRepository userRoleRepository;
 
 	@Autowired
-	RoleRepository roleRepository;
+	RoleService roleService;
 
-	public User register(RegisterUserDto registerUserDto) {
+	public User findById(int userId) throws NotFoundException {
+
+		return userRepository.findById(userId)
+				.orElseThrow(() -> new NotFoundException("Nije pronađen korisnik čiji je ID: " + userId + "!"));
+	}
+
+	public User register(RegisterUserDto registerUserDto, Authentication authentication) throws Exception {
+
+		boolean hasSuperAdminRole = authentication.getAuthorities().stream()
+				.anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+		if (!hasSuperAdminRole) {
+			throw new Exception("Ovaj korisnik nema ovlaštenje da dodjeluje uloge drugim korisnicima.");
+		}
 
 		User user = new User();
 
@@ -65,19 +82,7 @@ public class UserService {
 		user.setUsername(registerUserDto.getUsername());
 		user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
 
-		userRepository.save(user);
-
-		// kreiramo prvog usera i njemu dodijeljujemo rolu super_admin
-		if (userRepository.count() == 1) {
-			Role role = roleRepository.findByRoleName("ROLE_SUPER_ADMIN");
-			UserRole userRole = new UserRole();
-			userRole.setRole(role);
-			userRole.setUser(user);
-			userRole.setUserRoleKey(new UserRoleKey(user.getUserId(), role.getRoleId()));
-			userRoleRepository.save(userRole);
-		}
-
-		return user;
+		return userRepository.save(user);
 	}
 
 	public LoginResponseDto loginUser(LoginDto loginDto) throws BadCredentialsException {
@@ -91,6 +96,45 @@ public class UserService {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getUsername());
 		String jwt = jwtUtil.generateToken(userDetails);
 		return new LoginResponseDto(jwt);
+	}
+
+	public String changePassword(ChangePasswordDto changePasswordDto, Authentication authentication) throws Exception {
+
+		User user = userRepository.findByUsername(authentication.getName())
+				.orElseThrow(() -> new UsernameNotFoundException("Korisnik nije pronađen."));
+
+		if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
+			throw new Exception("Stari password nije tačan.");
+		}
+
+		user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+		userRepository.save(user);
+
+		return "Uspješno ste promijenili password";
+	}
+
+	@Transactional
+	public String assignRolesToUser(AssignRolesDto assignRolesDto, Authentication authentication) throws Exception {
+
+		boolean hasSuperAdminRole = authentication.getAuthorities().stream()
+				.anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+		if (!hasSuperAdminRole) {
+			throw new Exception("Ovaj korisnik nema ovlaštenje da dodjeluje uloge drugim korisnicima.");
+		}
+
+		User user = findById(assignRolesDto.getUserId());
+
+		userRoleRepository.deleteByUser(user);
+		assignRolesDto.getRoleIds().forEach(roleId -> {
+			UserRole userRole = new UserRole();
+			Role role = roleService.findById(roleId);
+			userRole.setRole(role);
+			userRole.setUser(user);
+			userRole.setUserRoleKey(new UserRoleKey(user.getUserId(), role.getRoleId()));
+			userRoleRepository.save(userRole);
+		});
+
+		return "Uspješno ste dodijelili uloge korisniku: " + user.getUsername() + "!";
 	}
 
 }
