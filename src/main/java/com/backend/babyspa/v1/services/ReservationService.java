@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.babyspa.v1.config.TenantContext;
 import com.backend.babyspa.v1.dtos.CreateReservationDto;
 import com.backend.babyspa.v1.dtos.ReservationDailyReportDto;
 import com.backend.babyspa.v1.dtos.ReservationFindAllDto;
@@ -160,8 +161,8 @@ public class ReservationService {
 
 	public List<ReservationFindAllDto> findAllList() {
 
-		return reservationRepository.findAll().stream().map(x -> buildReservationFindAllDtoFromReservation(x))
-				.collect(Collectors.toList());
+		return reservationRepository.findByTenantId(TenantContext.getTenant()).stream()
+				.map(x -> buildReservationFindAllDtoFromReservation(x)).collect(Collectors.toList());
 	}
 
 	public List<Reservation> findAllByArrangementId(int arrangementId) {
@@ -171,13 +172,14 @@ public class ReservationService {
 		return reservationRepository.findByArrangement(arrangement);
 	}
 
-	public void generateReservationReport(LocalDate date) {
+	@Transactional
+	public void generateReservationReport(LocalDate date, String tenantId) {
 		List<Status> statuses = statusService.findAllByStatusTypeCode(reservationStatusType);
 
 		if (!statuses.isEmpty()) {
 			statuses.forEach(status -> {
 				List<Object[]> usegesPerBaby = reservationRepository.countReservationPerBabyAndStatus(date,
-						status.getStatusId());
+						status.getStatusId(), tenantId);
 				if (Objects.nonNull(usegesPerBaby)) {
 					usegesPerBaby.forEach(useges -> {
 						ReservationDailyReportDto reservationDailyReportDto = new ReservationDailyReportDto();
@@ -209,14 +211,15 @@ public class ReservationService {
 		reservationRepository.save(reservation);
 	}
 
-	public void generateServicePackageReport(LocalDate date) {
+	@Transactional
+	public void generateServicePackageReport(LocalDate date, String tenantId) {
 		List<ServicePackage> servicePackages = servicePackageService.findAll();
 
 		if (!servicePackages.isEmpty()) {
 			servicePackages.forEach(servicePackage -> {
 				ServicePackageDailyReportDto servicePackageDailyReportDto = new ServicePackageDailyReportDto();
 				int usedPackages = reservationRepository.countServicePackageByStartDateAndServicePackageId(date,
-						servicePackage.getServicePackageId());
+						servicePackage.getServicePackageId(), tenantId);
 				servicePackageDailyReportDto.setNumberOfUsedPackages(usedPackages);
 				servicePackageDailyReportDto.setDate(date);
 				servicePackageDailyReportDto.setServicePackage(servicePackage);
@@ -248,8 +251,8 @@ public class ReservationService {
 		return reservationRepository.existsByArrangement(arrangement);
 	}
 
-//	@Async
-	public void generateReportForAllDateInReservation(boolean generateForAllDays, LocalDate date) {
+	@Transactional
+	public void generateReportForAllDateInReservation(boolean generateForAllDays, LocalDate date, String tenantId) {
 
 		if (generateForAllDays) {
 			reservationDailyReportService.deleteAll();
@@ -257,23 +260,23 @@ public class ReservationService {
 
 			LocalDate currentDate = LocalDate.now();
 			List<LocalDate> allDatesFromReservation = reservationRepository
-					.findDistinctReservationDates(currentDate.atStartOfDay()).stream().map(x -> x.getDate())
+					.findDistinctReservationDates(currentDate.atStartOfDay(), tenantId).stream().map(x -> x.getDate())
 					.collect(Collectors.toList());
 
 			allDatesFromReservation.forEach(x -> {
-				generateReservationReport(x);
-				generateServicePackageReport(x);
+				generateReservationReport(x, tenantId);
+				generateServicePackageReport(x, tenantId);
 			});
 		} else {
-			if (reservationDailyReportService.existsByDate(date)) {
-				reservationDailyReportService.deleteByDate(date);
+			if (reservationDailyReportService.existsByDateAndTenantId(date, tenantId)) {
+				reservationDailyReportService.deleteByDateAndTenantId(date, tenantId);
 			}
-			if (servicePackageDailyReportService.existsByDate(date)) {
-				servicePackageDailyReportService.deleteByDate(date);
+			if (servicePackageDailyReportService.existsByDateAndTenantId(date, tenantId)) {
+				servicePackageDailyReportService.deleteByDateAndTenantId(date, tenantId);
 			}
 
-			generateServicePackageReport(date);
-			generateReservationReport(date);
+			generateServicePackageReport(date, tenantId);
+			generateReservationReport(date, tenantId);
 		}
 	}
 

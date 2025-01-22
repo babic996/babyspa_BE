@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.backend.babyspa.v1.config.TenantContext;
 import com.backend.babyspa.v1.dtos.CreateServicePackageDto;
 import com.backend.babyspa.v1.dtos.ShortDetailsDto;
 import com.backend.babyspa.v1.dtos.UpdateServicePackageDto;
@@ -95,13 +96,13 @@ public class ServicePackageService {
 
 	public List<ShortDetailsDto> findAllList() {
 
-		return servicePackageRepository.findAll().stream().map(x -> buildShortDetailsDtoFromServicePackage(x))
-				.collect(Collectors.toList());
+		return servicePackageRepository.findAllByTenantId(TenantContext.getTenant()).stream()
+				.map(x -> buildShortDetailsDtoFromServicePackage(x)).collect(Collectors.toList());
 	}
 
 	public List<ServicePackage> findAll() {
 
-		return servicePackageRepository.findAll();
+		return servicePackageRepository.findAllByTenantId(TenantContext.getTenant());
 	}
 
 	private ShortDetailsDto buildShortDetailsDtoFromServicePackage(ServicePackage servicePackage) {
@@ -118,7 +119,8 @@ public class ServicePackageService {
 
 		Pageable pageable = PageRequest.of(page, size);
 
-		return servicePackageRepository.findAllServicePackageNative(searchText, startPrice, endPrice, pageable);
+		return servicePackageRepository.findAllServicePackageNative(searchText, startPrice, endPrice,
+				TenantContext.getTenant(), pageable);
 	}
 
 }

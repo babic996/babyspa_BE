@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.babyspa.v1.config.TenantContext;
 import com.backend.babyspa.v1.exceptions.NotFoundException;
 import com.backend.babyspa.v1.models.PaymentType;
 import com.backend.babyspa.v1.repositories.PaymentTypeRepository;
@@ -23,7 +24,7 @@ public class PaymentTypeService {
 
 	public List<PaymentType> findAll() {
 
-		return paymentTypeRepository.findAll();
+		return paymentTypeRepository.findByTenantId(TenantContext.getTenant());
 	}
 
 }

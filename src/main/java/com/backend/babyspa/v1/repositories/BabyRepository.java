@@ -14,9 +14,10 @@ import com.backend.babyspa.v1.models.Baby;
 @Repository
 public interface BabyRepository extends JpaRepository<Baby, Integer> {
 
-	boolean existsByPhoneNumberAndBabyName(String phoneNumber, String babyName);
+	boolean existsByPhoneNumberAndBabyNameAndTenantId(String phoneNumber, String babyName, String tenantId);
 
-	boolean existsByPhoneNumberAndBabyNameAndBabyIdNot(String phoneNumber, String babyName, int babyId);
+	boolean existsByPhoneNumberAndBabyNameAndTenantIdAndBabyIdNot(String phoneNumber, String babyName, String tenantId,
+			int babyId);
 
 	@Query(value = """
 			    SELECT *
@@ -26,10 +27,12 @@ public interface BabyRepository extends JpaRepository<Baby, Integer> {
 			           OR LOWER(baby_surname) LIKE LOWER(CONCAT('%', :searchText, '%'))
 			           OR REPLACE(phone_number, '+', '') LIKE CONCAT('%', REPLACE(:searchText, '+', ''), '%'))
 			      AND (birth_date >= :startDate AND birth_date <= :endDate)
+			      AND tenant_id = :tenantId
 			    ORDER BY baby_id DESC
 			""", nativeQuery = true)
 	Page<Baby> findAllNativeWithDate(@Param("searchText") String searchText,
-			@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
+			@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate,
+			@Param("tenantId") String tenantId, Pageable pageable);
 
 	@Query(value = """
 			    SELECT *
@@ -38,8 +41,10 @@ public interface BabyRepository extends JpaRepository<Baby, Integer> {
 			           OR LOWER(baby_name) LIKE LOWER(CONCAT('%', :searchText, '%'))
 			           OR LOWER(baby_surname) LIKE LOWER(CONCAT('%', :searchText, '%'))
 			           OR REPLACE(phone_number, '+', '') LIKE CONCAT('%', REPLACE(:searchText, '+', ''), '%'))
+			    AND tenant_id = :tenantId
 			    ORDER BY baby_id DESC
 			""", nativeQuery = true)
-	Page<Baby> findAllNativeWithoutDate(@Param("searchText") String searchText, Pageable pageable);
+	Page<Baby> findAllNativeWithoutDate(@Param("searchText") String searchText, @Param("tenantId") String tenantId,
+			Pageable pageable);
 
 }

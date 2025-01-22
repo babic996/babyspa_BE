@@ -35,9 +35,9 @@ public class Status {
 	@ManyToOne
 	@JoinColumn(name = "status_type_id", nullable = false)
 	private StatusType statusType;
-	
+
 	public Status(String statusName, String statusCode, StatusType statusType) {
-		
+
 		this.statusName = statusName;
 		this.statusCode = statusCode;
 		this.statusType = statusType;

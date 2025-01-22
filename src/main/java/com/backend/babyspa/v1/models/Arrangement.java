@@ -64,4 +64,7 @@ public class Arrangement {
 	@JoinColumn(name = "payment_type_id", nullable = true)
 	private PaymentType paymentType;
 
+	@Column(name = "tenant_id", nullable = true)
+	private String tenantId;
+
 }

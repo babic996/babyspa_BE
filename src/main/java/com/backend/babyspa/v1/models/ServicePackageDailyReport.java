@@ -27,14 +27,17 @@ public class ServicePackageDailyReport {
 	@Column(name = "service_package_daily_report_id", nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int servicePackageDailyReportId;
-	
+
 	@Column(name = "number_of_used_packages", nullable = false)
 	private int numberOfUsedPackages;
-	
+
 	@Column(name = "date", nullable = false)
 	private LocalDate date;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "service_package_id", nullable = true)
 	private ServicePackage servicePackage;
+
+	@Column(name = "tenant_id", nullable = true)
+	private String tenantId;
 }

@@ -23,6 +23,7 @@ public class ServicePackageDailyReportService {
 	@Autowired
 	ServicePackageDailyReportRepository servicePackageDailyReportRepository;
 
+	@Transactional
 	public ServicePackageDailyReport save(ServicePackageDailyReportDto servicePackageDailyReportDto) {
 
 		ServicePackageDailyReport servicePackageDailyReport = new ServicePackageDailyReport();
@@ -69,9 +70,9 @@ public class ServicePackageDailyReportService {
 		return null;
 	}
 
-	public boolean existsByDate(LocalDate date) {
+	public boolean existsByDateAndTenantId(LocalDate date, String tenantId) {
 
-		return servicePackageDailyReportRepository.existsByDate(date);
+		return servicePackageDailyReportRepository.existsByDateAndTenantId(date, tenantId);
 	}
 
 	@Transactional
@@ -81,9 +82,8 @@ public class ServicePackageDailyReportService {
 	}
 
 	@Transactional
-	public void deleteByDate(LocalDate date) {
+	public void deleteByDateAndTenantId(LocalDate date, String tenantId) {
 
-		servicePackageDailyReportRepository.deleteByDate(date);
+		servicePackageDailyReportRepository.deleteByDateAndTenantId(date, tenantId);
 	}
-
 }

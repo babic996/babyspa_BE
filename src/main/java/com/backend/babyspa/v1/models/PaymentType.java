@@ -29,7 +29,10 @@ public class PaymentType {
 
 	@Column(name = "payment_type_code", nullable = false)
 	private String paymentTypeCode;
-	
+
+	@Column(name = "tenant_id", nullable = true)
+	private String tenantId;
+
 	public PaymentType(String paymentTypeName, String paymentTypeCode) {
 		this.paymentTypeName = paymentTypeName;
 		this.paymentTypeCode = paymentTypeCode;

@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.backend.babyspa.v1.config.TenantContext;
 import com.backend.babyspa.v1.dtos.CreateBabyDto;
 import com.backend.babyspa.v1.dtos.ShortDetailsDto;
 import com.backend.babyspa.v1.dtos.UpdateBabyDto;
@@ -42,8 +43,8 @@ public class BabyService {
 	public Baby save(CreateBabyDto createBabyDto) throws Exception {
 		Baby baby = new Baby();
 
-		if (babyRepository.existsByPhoneNumberAndBabyName(createBabyDto.getPhoneNumber(),
-				createBabyDto.getBabyName())) {
+		if (babyRepository.existsByPhoneNumberAndBabyNameAndTenantId(createBabyDto.getPhoneNumber(),
+				createBabyDto.getBabyName(), TenantContext.getTenant())) {
 			throw new Exception("Ova beba je već unesena u sistem!");
 		}
 
@@ -62,8 +63,8 @@ public class BabyService {
 
 		Baby baby = findById(updateBabyDto.getBabyId());
 
-		if (babyRepository.existsByPhoneNumberAndBabyNameAndBabyIdNot(updateBabyDto.getPhoneNumber(),
-				updateBabyDto.getBabyName(), updateBabyDto.getBabyId())) {
+		if (babyRepository.existsByPhoneNumberAndBabyNameAndTenantIdAndBabyIdNot(updateBabyDto.getPhoneNumber(),
+				updateBabyDto.getBabyName(), TenantContext.getTenant(), updateBabyDto.getBabyId())) {
 			throw new Exception("Ova beba je već unesena u sistem!");
 		}
 
@@ -103,9 +104,9 @@ public class BabyService {
 		Pageable pageable = PageRequest.of(page, size);
 
 		if (Objects.isNull(start) && Objects.isNull(end)) {
-			return babyRepository.findAllNativeWithoutDate(searchText, pageable);
+			return babyRepository.findAllNativeWithoutDate(searchText, TenantContext.getTenant(), pageable);
 		} else {
-			return babyRepository.findAllNativeWithDate(searchText, start, end, pageable);
+			return babyRepository.findAllNativeWithDate(searchText, start, end, TenantContext.getTenant(), pageable);
 		}
 	}
 
