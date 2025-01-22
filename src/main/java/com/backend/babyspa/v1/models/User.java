@@ -39,6 +39,9 @@ public class User {
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
 
+	@Column(name = "tenant_id", nullable = true)
+	private String tenantId;
+
 	public User(String email, String username, String password, String firstName, String lastName) {
 
 		this.email = email;

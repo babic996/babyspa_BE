@@ -65,6 +65,7 @@ public class JwtUtil {
 		claims.put("firstName", user.getFirstName());
 		claims.put("lastName", user.getLastName());
 		claims.put("role", userRoles);
+		claims.put("tenant_id", user.getTenantId());
 		return createToken(claims, userDetails.getUsername());
 	}
 
@@ -91,5 +92,10 @@ public class JwtUtil {
 		calendar.add(Calendar.HOUR, hours);
 
 		return calendar.getTime();
+	}
+
+	public String extractTenantId(String token) {
+		return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().get("tenant_id", String.class);
+
 	}
 }

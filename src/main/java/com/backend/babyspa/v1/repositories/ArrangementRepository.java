@@ -39,12 +39,14 @@ public interface ArrangementRepository extends JpaRepository<Arrangement, Intege
 			AND (:servicePackageId IS NULL OR sp.service_package_id = :servicePackageId)
 			AND (:startPrice IS NULL OR :endPrice IS NULL OR a.price BETWEEN :startPrice AND :endPrice)
 			AND (:remainingTerm IS NULL OR a.remaining_term = :remainingTerm)
+			AND (a.tenant_id = :tenantId)
 			ORDER BY a.arrangement_id DESC
 			""", nativeQuery = true)
 	List<Arrangement> findAllArrangementNative(@Param("statusId") Integer statusId, @Param("babyId") Integer babyId,
 			@Param("paymentTypeId") Integer paymentTypeId, @Param("startPrice") BigDecimal startPrice,
 			@Param("endPrice") BigDecimal endPrice, @Param("remainingTerm") Integer remainingTerm,
-			@Param("servicePackageId") Integer servicePackageId, @Param("arrangementId") Integer arrangementId);
+			@Param("servicePackageId") Integer servicePackageId, @Param("arrangementId") Integer arrangementId,
+			@Param("tenantId") String tenantId);
 
 	@Query(value = """
 			SELECT a.*
@@ -61,6 +63,7 @@ public interface ArrangementRepository extends JpaRepository<Arrangement, Intege
 			AND (:startPrice IS NULL OR :endPrice IS NULL OR a.price BETWEEN :startPrice AND :endPrice)
 			AND (:remainingTerm IS NULL OR a.remaining_term = :remainingTerm)
 			AND (created_at >= :startDate AND created_at <= :endDate)
+			AND (a.tenant_id = :tenantId)
 			ORDER BY a.arrangement_id DESC
 			""", nativeQuery = true)
 	List<Arrangement> findAllArrangementNativeWithStartDateAndDate(@Param("statusId") Integer statusId,
@@ -68,7 +71,7 @@ public interface ArrangementRepository extends JpaRepository<Arrangement, Intege
 			@Param("startPrice") BigDecimal startPrice, @Param("endPrice") BigDecimal endPrice,
 			@Param("remainingTerm") Integer remainingTerm, @Param("servicePackageId") Integer servicePackageId,
 			@Param("arrangementId") Integer arrangementId, @Param("startDate") LocalDateTime startDate,
-			@Param("endDate") LocalDateTime endDate);
+			@Param("endDate") LocalDateTime endDate, @Param("tenantId") String tenantId);
 
 	@Query(value = """
 			SELECT SUM(a.price)
@@ -84,11 +87,13 @@ public interface ArrangementRepository extends JpaRepository<Arrangement, Intege
 			AND (:servicePackageId IS NULL OR sp.service_package_id = :servicePackageId)
 			AND (:startPrice IS NULL OR :endPrice IS NULL OR a.price BETWEEN :startPrice AND :endPrice)
 			AND (:remainingTerm IS NULL OR a.remaining_term = :remainingTerm)
+			AND (a.tenant_id = :tenantId)
 			""", nativeQuery = true)
 	BigDecimal findPriceForAllArrangementNative(@Param("statusId") Integer statusId, @Param("babyId") Integer babyId,
 			@Param("paymentTypeId") Integer paymentTypeId, @Param("startPrice") BigDecimal startPrice,
 			@Param("endPrice") BigDecimal endPrice, @Param("remainingTerm") Integer remainingTerm,
-			@Param("servicePackageId") Integer servicePackageId, @Param("arrangementId") Integer arrangementId);
+			@Param("servicePackageId") Integer servicePackageId, @Param("arrangementId") Integer arrangementId,
+			@Param("tenantId") String tenantId);
 
 	@Query(value = """
 			SELECT SUM(a.price)
@@ -105,11 +110,12 @@ public interface ArrangementRepository extends JpaRepository<Arrangement, Intege
 			AND (:startPrice IS NULL OR :endPrice IS NULL OR a.price BETWEEN :startPrice AND :endPrice)
 			AND (:remainingTerm IS NULL OR a.remaining_term = :remainingTerm)
 			AND (a.created_at >= :startDate AND a.created_at <= :endDate)
+			AND (a.tenant_id = :tenantId)
 			""", nativeQuery = true)
 	BigDecimal findPriceForAllArrangementNativeWithStartDateAndDate(@Param("statusId") Integer statusId,
 			@Param("babyId") Integer babyId, @Param("paymentTypeId") Integer paymentTypeId,
 			@Param("startPrice") BigDecimal startPrice, @Param("endPrice") BigDecimal endPrice,
 			@Param("remainingTerm") Integer remainingTerm, @Param("servicePackageId") Integer servicePackageId,
 			@Param("arrangementId") Integer arrangementId, @Param("startDate") LocalDateTime startDate,
-			@Param("endDate") LocalDateTime endDate);
+			@Param("endDate") LocalDateTime endDate, @Param("tenantId") String tenantId);
 }

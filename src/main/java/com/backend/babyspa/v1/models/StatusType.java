@@ -26,8 +26,8 @@ public class StatusType {
 
 	@Column(name = "status_type_code", nullable = false)
 	private String statusTypeCode;
-	
+
 	public StatusType(String statusTypeCode) {
-        this.statusTypeCode = statusTypeCode;
-    }
+		this.statusTypeCode = statusTypeCode;
+	}
 }

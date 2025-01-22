@@ -40,6 +40,9 @@ public class Reservation {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 
+	@Column(name = "tenant_id", nullable = true)
+	private String tenantId;
+
 	@ManyToOne
 	@JoinColumn(name = "arrangement_id", nullable = false)
 	private Arrangement arrangement;

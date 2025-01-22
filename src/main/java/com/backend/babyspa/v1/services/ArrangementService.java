@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.backend.babyspa.v1.config.TenantContext;
 import com.backend.babyspa.v1.dtos.CreateArrangementDto;
 import com.backend.babyspa.v1.dtos.FindAllArrangementDto;
 import com.backend.babyspa.v1.dtos.ShortDetailsDto;
@@ -207,11 +208,11 @@ public class ArrangementService {
 
 		if (Objects.isNull(startDate) && Objects.isNull(endDate)) {
 			arrangement = arrangementRepository.findAllArrangementNative(statusId, babyId, paymentTypeId, startPrice,
-					endPrice, remaingingTerm, servicePackageId, arrangementId);
+					endPrice, remaingingTerm, servicePackageId, arrangementId, TenantContext.getTenant());
 		} else {
 			arrangement = arrangementRepository.findAllArrangementNativeWithStartDateAndDate(statusId, babyId,
 					paymentTypeId, startPrice, endPrice, remaingingTerm, servicePackageId, arrangementId, startDate,
-					endDate);
+					endDate, TenantContext.getTenant());
 		}
 
 		arrangementDto = arrangement.stream().map(x -> buildFindAllArrangementDtoFromArrangement(x))
@@ -244,11 +245,11 @@ public class ArrangementService {
 
 		if (Objects.isNull(startDate) && Objects.isNull(endDate)) {
 			price = arrangementRepository.findPriceForAllArrangementNative(statusId, babyId, paymentTypeId, startPrice,
-					endPrice, remaingingTerm, servicePackageId, arrangementId);
+					endPrice, remaingingTerm, servicePackageId, arrangementId, TenantContext.getTenant());
 		} else {
 			price = arrangementRepository.findPriceForAllArrangementNativeWithStartDateAndDate(statusId, babyId,
 					paymentTypeId, startPrice, endPrice, remaingingTerm, servicePackageId, arrangementId, startDate,
-					endDate);
+					endDate, TenantContext.getTenant());
 		}
 
 		return price;

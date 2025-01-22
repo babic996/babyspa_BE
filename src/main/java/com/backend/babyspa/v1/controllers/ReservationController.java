@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.babyspa.v1.config.TenantContext;
 import com.backend.babyspa.v1.dtos.CreateReservationDto;
 import com.backend.babyspa.v1.dtos.ReservationFindAllDto;
 import com.backend.babyspa.v1.dtos.ReservationShortInfo;
@@ -136,7 +137,7 @@ public class ReservationController extends BaseController {
 			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam(required = false) LocalDateTime date) {
 
 		reservationService.generateReportForAllDateInReservation(generateForAllDays,
-				Objects.nonNull(date) ? date.toLocalDate() : null);
+				Objects.nonNull(date) ? date.toLocalDate() : null, TenantContext.getTenant());
 	}
 
 }

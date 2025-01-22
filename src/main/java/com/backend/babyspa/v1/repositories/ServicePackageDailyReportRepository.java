@@ -16,9 +16,9 @@ public interface ServicePackageDailyReportRepository extends JpaRepository<Servi
 
 	List<ServicePackageDailyReport> findAllByServicePackageIsNull();
 
-	boolean existsByDate(LocalDate date);
+	boolean existsByDateAndTenantId(LocalDate date, String tenantId);
 
-	void deleteByDate(LocalDate date);
+	void deleteByDateAndTenantId(LocalDate date, String tenantId);
 
 	@Query(value = """
 			SELECT
@@ -52,7 +52,7 @@ public interface ServicePackageDailyReportRepository extends JpaRepository<Servi
 	List<ServicePackagesDailyReportProjection> findAllByServicePackageIdAndStartDateAndEndDate(
 			@Param("servicePackageId") Integer servicePackageId, @Param("startDate") LocalDate startDate,
 			@Param("endDate") LocalDate endDate);
-	
+
 	@Query(value = """
 			SELECT
 			    TO_CHAR(date, 'Month YYYY') AS date,
@@ -85,7 +85,7 @@ public interface ServicePackageDailyReportRepository extends JpaRepository<Servi
 	List<ServicePackagesDailyReportProjection> findAllByServicePackageIdAndStartDateAndEndDateGroupByMonth(
 			@Param("servicePackageId") Integer servicePackageId, @Param("startDate") LocalDate startDate,
 			@Param("endDate") LocalDate endDate);
-	
+
 	@Query(value = """
 			SELECT
 			    TO_CHAR(date, 'YYYY') AS date,

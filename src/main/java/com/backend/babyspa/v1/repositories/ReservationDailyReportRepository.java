@@ -17,9 +17,9 @@ public interface ReservationDailyReportRepository extends JpaRepository<Reservat
 
 	List<ReservationDailyReport> findByStatus(Status status);
 
-	boolean existsByDate(LocalDate date);
+	boolean existsByDateAndTenantId(LocalDate date, String tenantId);
 
-	void deleteByDate(LocalDate date);
+	void deleteByDateAndTenantId(LocalDate date, String tenantId);
 
 	@Query(value = """
 			SELECT
@@ -54,28 +54,27 @@ public interface ReservationDailyReportRepository extends JpaRepository<Reservat
 	List<ReservationDailyReportProjection> findAllByStatusIdAndBabyIdAndStartDateAndEndDate(
 			@Param("statusId") Integer statusId, @Param("babyId") Integer babyId,
 			@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-	
-	
+
 	@Query(value = """
 			SELECT
-				TO_CHAR(date, 'Month YYYY') AS date,  
+				TO_CHAR(date, 'Month YYYY') AS date,
 				SUM(number_of_reservation) AS number_of_reservation
 			FROM
 				reservation_daily_report
 			WHERE
-				(:statusId IS NULL OR status_id = :statusId) 
+				(:statusId IS NULL OR status_id = :statusId)
 			AND (:babyId IS NULL OR baby_id = :babyId)
 			GROUP BY
-				TO_CHAR(date, 'Month YYYY')  
+				TO_CHAR(date, 'Month YYYY')
 			ORDER BY
-			 	MIN(date) ASC;  
+			 	MIN(date) ASC;
 						""", nativeQuery = true)
 	List<ReservationDailyReportProjection> findAllByStatusIdAndBabyIdGroupByMonth(@Param("statusId") Integer statusId,
 			@Param("babyId") Integer babyId);
-	
+
 	@Query(value = """
 			SELECT
-			    TO_CHAR(date, 'Month YYYY') AS date, 
+			    TO_CHAR(date, 'Month YYYY') AS date,
 			    SUM(number_of_reservation) AS number_of_reservation
 			FROM
 			    reservation_daily_report
@@ -90,24 +89,24 @@ public interface ReservationDailyReportRepository extends JpaRepository<Reservat
 	List<ReservationDailyReportProjection> findAllByStatusIdAndBabyIdAndStartDateAndEndDateGroupByMonth(
 			@Param("statusId") Integer statusId, @Param("babyId") Integer babyId,
 			@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-	
+
 	@Query(value = """
 			SELECT
-				TO_CHAR(date, 'YYYY') AS date,  
+				TO_CHAR(date, 'YYYY') AS date,
 				SUM(number_of_reservation) AS number_of_reservation
 			FROM
 				reservation_daily_report
 			WHERE
-				(:statusId IS NULL OR status_id = :statusId) 
+				(:statusId IS NULL OR status_id = :statusId)
 			AND (:babyId IS NULL OR baby_id = :babyId)
 			GROUP BY
-				TO_CHAR(date, 'YYYY')  
+				TO_CHAR(date, 'YYYY')
 			ORDER BY
-			 	MIN(date) ASC;  
+			 	MIN(date) ASC;
 						""", nativeQuery = true)
 	List<ReservationDailyReportProjection> findAllByStatusIdAndBabyIdGroupByYear(@Param("statusId") Integer statusId,
 			@Param("babyId") Integer babyId);
-	
+
 	@Query(value = """
 			SELECT
 			    TO_CHAR(date, 'YYYY') AS date,

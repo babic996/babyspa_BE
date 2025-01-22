@@ -26,6 +26,7 @@ public class ReservationDailyReportService {
 	@Autowired
 	BabyService babyService;
 
+	@Transactional
 	public ReservationDailyReport save(ReservationDailyReportDto reservationDailyReportDto) {
 
 		ReservationDailyReport reservationDailyReport = new ReservationDailyReport();
@@ -74,9 +75,9 @@ public class ReservationDailyReportService {
 		return null;
 	}
 
-	public boolean existsByDate(LocalDate date) {
+	public boolean existsByDateAndTenantId(LocalDate date, String tenantId) {
 
-		return reservationDailyReportRepository.existsByDate(date);
+		return reservationDailyReportRepository.existsByDateAndTenantId(date, tenantId);
 	}
 
 	@Transactional
@@ -86,8 +87,8 @@ public class ReservationDailyReportService {
 	}
 
 	@Transactional
-	public void deleteByDate(LocalDate date) {
+	public void deleteByDateAndTenantId(LocalDate date, String tenantId) {
 
-		reservationDailyReportRepository.deleteByDate(date);
+		reservationDailyReportRepository.deleteByDateAndTenantId(date, tenantId);
 	}
 }

@@ -46,4 +46,8 @@ public class Baby {
 
 	@Column(name = "note", columnDefinition = "TEXT", nullable = true)
 	private String note;
+
+	@Column(name = "tenant_id", nullable = true)
+	private String tenantId;
+
 }

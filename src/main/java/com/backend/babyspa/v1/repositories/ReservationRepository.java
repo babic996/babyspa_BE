@@ -41,12 +41,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 			JOIN
 			arrangement a ON r.arrangement_id = a.arrangement_id
 			WHERE
-			DATE(r.start_date) = :currentDate AND r.status_id = :statusId
+			DATE(r.start_date) = :currentDate AND r.status_id = :statusId AND r.tenant_id = :tenantId
 			GROUP BY
 			 a.baby_id;
 			""", nativeQuery = true)
 	List<Object[]> countReservationPerBabyAndStatus(@Param("currentDate") LocalDate currentDate,
-			@Param("statusId") int statusId);
+			@Param("statusId") int statusId, @Param("tenantId") String tenantId);
 
 	@Query(value = """
 			SELECT COALESCE(SUM(counts), 0) AS total_count
@@ -54,14 +54,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 			SELECT COUNT(r.*) AS counts
 			FROM reservation r
 			LEFT JOIN arrangement a ON r.arrangement_id = a.arrangement_id
-			WHERE DATE(r.start_date) = :currentDate AND a.service_package_id = :servicePackageId
+			WHERE DATE(r.start_date) = :currentDate AND a.service_package_id = :servicePackageId AND r.tenant_id = :tenantId
 			GROUP BY r.arrangement_id
 			) AS subquery
 			""", nativeQuery = true)
 	int countServicePackageByStartDateAndServicePackageId(@Param("currentDate") LocalDate currentDate,
-			@Param("servicePackageId") int servicePackageId);
+			@Param("servicePackageId") int servicePackageId, @Param("tenantId") String tenantId);
 
-	@Query(value = "SELECT DISTINCT DATE(start_date) FROM reservation WHERE start_date < :currentDateTime", nativeQuery = true)
-	List<LocalDateProjection> findDistinctReservationDates(LocalDateTime currentDateTime);
+	@Query(value = "SELECT DISTINCT DATE(start_date) FROM reservation WHERE start_date < :currentDateTime AND tenant_id = :tenantId", nativeQuery = true)
+	List<LocalDateProjection> findDistinctReservationDates(@Param("currentDateTime") LocalDateTime currentDateTime,
+			@Param("tenantId") String tenantId);
+
+	List<Reservation> findByTenantId(String tenantId);
 
 }

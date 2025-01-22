@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.babyspa.v1.config.TenantContext;
 import com.backend.babyspa.v1.dtos.CreateDiscountDto;
 import com.backend.babyspa.v1.dtos.UpdateDiscountDto;
 import com.backend.babyspa.v1.exceptions.NotFoundException;
@@ -79,6 +80,6 @@ public class DiscountService {
 
 	public List<Discount> findAll() {
 
-		return discountRepository.findAll();
+		return discountRepository.findByTenantId(TenantContext.getTenant());
 	}
 }
