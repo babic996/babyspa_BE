@@ -40,7 +40,7 @@ public class Reservation {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 
-	@Column(name = "tenant_id", nullable = true)
+	@Column(name = "tenant_id", nullable = false)
 	private String tenantId;
 
 	@ManyToOne
@@ -52,7 +52,7 @@ public class Reservation {
 	private Status status;
 
 	@ManyToOne
-	@JoinColumn(name = "created_by_user_id", referencedColumnName = "user_id", nullable = true)
+	@JoinColumn(name = "created_by_user_id", referencedColumnName = "user_id", nullable = false)
 	private User createdByUser;
 
 	@ManyToOne

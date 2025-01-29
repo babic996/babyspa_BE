@@ -43,11 +43,11 @@ public class ServicePackage {
 	@Column(name = "note", columnDefinition = "TEXT", nullable = true)
 	private String note;
 
-	@Column(name = "tenant_id", nullable = true)
+	@Column(name = "tenant_id", nullable = false)
 	private String tenantId;
 
 	@ManyToOne
-	@JoinColumn(name = "created_by_user_id", referencedColumnName = "user_id", nullable = true)
+	@JoinColumn(name = "created_by_user_id", referencedColumnName = "user_id", nullable = false)
 	private User createdByUser;
 
 	@ManyToOne

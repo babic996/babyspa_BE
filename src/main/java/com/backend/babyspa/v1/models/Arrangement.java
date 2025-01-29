@@ -65,14 +65,14 @@ public class Arrangement {
 	private PaymentType paymentType;
 
 	@ManyToOne
-	@JoinColumn(name = "created_by_user_id", referencedColumnName = "user_id", nullable = true)
+	@JoinColumn(name = "created_by_user_id", referencedColumnName = "user_id", nullable = false)
 	private User createdByUser;
 
 	@ManyToOne
 	@JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", nullable = true)
 	private User updatedByUser;
 
-	@Column(name = "tenant_id", nullable = true)
+	@Column(name = "tenant_id", nullable = false)
 	private String tenantId;
 
 }

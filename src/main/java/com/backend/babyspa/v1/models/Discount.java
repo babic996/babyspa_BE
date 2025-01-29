@@ -35,7 +35,7 @@ public class Discount {
 	@Column(name = "discount_name", nullable = false)
 	private String discountName;
 
-	@Column(name = "tenant_id", nullable = true)
+	@Column(name = "tenant_id", nullable = false)
 	private String tenantId;
 
 	public Discount(BigDecimal value, boolean isPrecentage, String discountName, String tenantId) {

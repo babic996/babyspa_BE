@@ -30,7 +30,7 @@ public class PaymentType {
 	@Column(name = "payment_type_code", nullable = false)
 	private String paymentTypeCode;
 
-	@Column(name = "tenant_id", nullable = true)
+	@Column(name = "tenant_id", nullable = false)
 	private String tenantId;
 
 	public PaymentType(String paymentTypeName, String paymentTypeCode, String tenantId) {

@@ -38,7 +38,7 @@ public class ReservationDailyReport {
 	@JoinColumn(name = "baby_id", nullable = false)
 	private Baby baby;
 
-	@Column(name = "tenant_id", nullable = true)
+	@Column(name = "tenant_id", nullable = false)
 	private String tenantId;
 
 	@ManyToOne

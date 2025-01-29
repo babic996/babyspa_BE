@@ -38,6 +38,6 @@ public class ServicePackageDailyReport {
 	@JoinColumn(name = "service_package_id", nullable = true)
 	private ServicePackage servicePackage;
 
-	@Column(name = "tenant_id", nullable = true)
+	@Column(name = "tenant_id", nullable = false)
 	private String tenantId;
 }
