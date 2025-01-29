@@ -65,6 +65,12 @@ public class UserService {
 				.orElseThrow(() -> new NotFoundException("Nije pronađen korisnik čiji je ID: " + userId + "!"));
 	}
 
+	public User findByUsername(String username) throws NotFoundException {
+
+		return userRepository.findByUsername(username)
+				.orElseThrow(() -> new NotFoundException("Nije pronađen korisnik čiji je username: " + username + "!"));
+	}
+
 	public User register(RegisterNewUserDto registerNewUserDto, Authentication authentication) throws Exception {
 
 		boolean hasSuperAdminRole = authentication.getAuthorities().stream()

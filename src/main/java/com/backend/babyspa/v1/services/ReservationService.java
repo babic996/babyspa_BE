@@ -47,6 +47,9 @@ public class ReservationService {
 	@Autowired
 	ServicePackageDailyReportService servicePackageDailyReportService;
 
+	@Autowired
+	UserService userService;
+
 	private final String reservationReserved = "term_reserved";
 	private final String reservationUsed = "term_used";
 	private final String reservationCanceled = "term_canceled";
@@ -100,7 +103,7 @@ public class ReservationService {
 				createReservationDto.getStartDate().plusMinutes(createReservationDto.getDurationReservation()));
 		reservation.setStatus(status);
 		reservation.setNote(createReservationDto.getNote());
-		reservation.setCreatedByUser(SecurityUtil.getCurrentUser());
+		reservation.setCreatedByUser(SecurityUtil.getCurrentUser(userService));
 		arrangementService.decreaseRemainingTerm(arrangement);
 
 		reservationRepository.save(reservation);
@@ -132,7 +135,7 @@ public class ReservationService {
 		}
 
 		reservation.setNote(updateReservationDto.getNote());
-		reservation.setUpdatedByUser(SecurityUtil.getCurrentUser());
+		reservation.setUpdatedByUser(SecurityUtil.getCurrentUser(userService));
 
 		reservationRepository.save(reservation);
 

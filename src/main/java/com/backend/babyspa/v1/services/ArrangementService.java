@@ -57,6 +57,9 @@ public class ArrangementService {
 	@Autowired
 	PaymentTypeService paymentTypeService;
 
+	@Autowired
+	UserService userService;
+
 	private final String createdStatus = "created";
 
 	public Arrangement findById(int arrangementId) throws NotFoundException {
@@ -97,7 +100,7 @@ public class ArrangementService {
 		arrangement.setRemainingTerm(servicePackage.getTermNumber());
 		arrangement.setServicePackage(servicePackage);
 		arrangement.setStatus(status);
-		arrangement.setCreatedByUser(SecurityUtil.getCurrentUser());
+		arrangement.setCreatedByUser(SecurityUtil.getCurrentUser(userService));
 
 		return arrangementRepository.save(arrangement);
 	}
@@ -156,7 +159,7 @@ public class ArrangementService {
 		arrangement.setNote(updateArrangementDto.getNote());
 		arrangement.setStatus(status);
 		arrangement.setExtendDurationDays(updateArrangementDto.getExtendDurationDays());
-		arrangement.setUpdatedByUser(SecurityUtil.getCurrentUser());
+		arrangement.setUpdatedByUser(SecurityUtil.getCurrentUser(userService));
 
 		arrangementRepository.save(arrangement);
 		return buildFindAllArrangementDtoFromArrangement(arrangement);

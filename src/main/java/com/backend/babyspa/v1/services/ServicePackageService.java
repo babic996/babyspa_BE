@@ -31,6 +31,9 @@ public class ServicePackageService {
 	@Autowired
 	ArrangementRepository arrangementRepository;
 
+	@Autowired
+	UserService userService;
+
 	public ServicePackage findById(Integer servicePackageId) throws NotFoundException {
 
 		ServicePackage servicePackage = servicePackageRepository.findById(servicePackageId).orElseThrow(
@@ -52,7 +55,7 @@ public class ServicePackageService {
 		servicePackage.setServicePackageDurationDays(createServicePackageDto.getServicePackageDurationDays());
 		servicePackage.setTermNumber(createServicePackageDto.getTermNumber());
 		servicePackage.setNote(createServicePackageDto.getNote());
-		servicePackage.setCreatedByUser(SecurityUtil.getCurrentUser());
+		servicePackage.setCreatedByUser(SecurityUtil.getCurrentUser(userService));
 
 		return servicePackageRepository.save(servicePackage);
 	}
@@ -74,7 +77,7 @@ public class ServicePackageService {
 
 		servicePackage.setPrice(updateServicePackageDto.getPrice());
 		servicePackage.setNote(updateServicePackageDto.getNote());
-		servicePackage.setUpdatedByUser(SecurityUtil.getCurrentUser());
+		servicePackage.setUpdatedByUser(SecurityUtil.getCurrentUser(userService));
 
 		return servicePackageRepository.save(servicePackage);
 	}

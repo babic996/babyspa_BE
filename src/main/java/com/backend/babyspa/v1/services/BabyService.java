@@ -33,6 +33,9 @@ public class BabyService {
 	@Autowired
 	ArrangementRepository arrangementRepository;
 
+	@Autowired
+	UserService userService;
+
 	public Baby findById(Integer babyId) throws NotFoundException {
 
 		Baby baby = babyRepository.findById(babyId)
@@ -56,7 +59,7 @@ public class BabyService {
 		baby.setNote(createBabyDto.getNote());
 		baby.setNumberOfMonths(createBabyDto.getNumberOfMonths());
 		baby.setPhoneNumber(createBabyDto.getPhoneNumber());
-		baby.setCreatedByUser(SecurityUtil.getCurrentUser());
+		baby.setCreatedByUser(SecurityUtil.getCurrentUser(userService));
 
 		return babyRepository.save(baby);
 	}
@@ -77,7 +80,7 @@ public class BabyService {
 		baby.setNote(updateBabyDto.getNote());
 		baby.setNumberOfMonths(updateBabyDto.getNumberOfMonths());
 		baby.setPhoneNumber(updateBabyDto.getPhoneNumber());
-		baby.setUpdatedByUser(SecurityUtil.getCurrentUser());
+		baby.setUpdatedByUser(SecurityUtil.getCurrentUser(userService));
 
 		return babyRepository.save(baby);
 
