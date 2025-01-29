@@ -1,5 +1,9 @@
 package com.backend.babyspa.v1.services;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -11,12 +15,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.backend.babyspa.v1.config.TenantContext;
 import com.backend.babyspa.v1.config.UserDetailsServiceImpl;
+import com.backend.babyspa.v1.dtos.AddNewTenantUserDto;
 import com.backend.babyspa.v1.dtos.AssignRolesDto;
 import com.backend.babyspa.v1.dtos.ChangePasswordDto;
 import com.backend.babyspa.v1.dtos.LoginDto;
 import com.backend.babyspa.v1.dtos.LoginResponseDto;
-import com.backend.babyspa.v1.dtos.RegisterUserDto;
+import com.backend.babyspa.v1.dtos.RegisterNewUserDto;
+import com.backend.babyspa.v1.dtos.UpdateUserDto;
 import com.backend.babyspa.v1.exceptions.NotFoundException;
 import com.backend.babyspa.v1.models.Role;
 import com.backend.babyspa.v1.models.User;
@@ -58,31 +65,72 @@ public class UserService {
 				.orElseThrow(() -> new NotFoundException("Nije pronađen korisnik čiji je ID: " + userId + "!"));
 	}
 
-	public User register(RegisterUserDto registerUserDto, Authentication authentication) throws Exception {
+	public User register(RegisterNewUserDto registerNewUserDto, Authentication authentication) throws Exception {
 
 		boolean hasSuperAdminRole = authentication.getAuthorities().stream()
-				.anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+				.anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
 		if (!hasSuperAdminRole) {
 			throw new Exception("Ovaj korisnik nema ovlaštenje da dodjeluje uloge drugim korisnicima.");
 		}
 
 		User user = new User();
 
-		if (userRepository.existsByUsername(registerUserDto.getUsername())) {
+		if (userRepository.existsByUsername(registerNewUserDto.getUsername())) {
 			throw new IllegalArgumentException("Username već postoji.");
 		}
 
-		if (userRepository.existsByEmail(registerUserDto.getEmail())) {
+		if (userRepository.existsByEmail(registerNewUserDto.getEmail())) {
 			throw new IllegalArgumentException("Email već postoji.");
 		}
 
-		user.setEmail(registerUserDto.getEmail());
-		user.setFirstName(registerUserDto.getFirstName());
-		user.setLastName(registerUserDto.getLastName());
-		user.setUsername(registerUserDto.getUsername());
-		user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
+		user.setEmail(registerNewUserDto.getEmail());
+		user.setFirstName(registerNewUserDto.getFirstName());
+		user.setLastName(registerNewUserDto.getLastName());
+		user.setUsername(registerNewUserDto.getUsername() + TenantContext.getTenant());
+		user.setPassword(passwordEncoder.encode(registerNewUserDto.getPassword()));
 
 		return userRepository.save(user);
+	}
+
+	@Transactional
+	public User addNewTenantUser(AddNewTenantUserDto addNewTenantUserDto, Authentication authentication)
+			throws Exception {
+
+		boolean hasSuperAdminRole = authentication.getAuthorities().stream()
+				.anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+		if (!hasSuperAdminRole) {
+			throw new Exception("Ovaj korisnik nema ovlaštenje da dodaje nove tenante.");
+		}
+
+		User user = new User();
+
+		if (userRepository.existsByUsername(addNewTenantUserDto.getUsername())) {
+			throw new IllegalArgumentException("Username već postoji.");
+		}
+
+		if (userRepository.existsByEmail(addNewTenantUserDto.getEmail())) {
+			throw new IllegalArgumentException("Email već postoji.");
+		}
+
+		user.setEmail(addNewTenantUserDto.getEmail());
+		user.setFirstName(addNewTenantUserDto.getFirstName());
+		user.setLastName(addNewTenantUserDto.getLastName());
+		user.setUsername(addNewTenantUserDto.getUsername());
+		user.setPassword(passwordEncoder.encode(addNewTenantUserDto.getPassword()));
+
+		userRepository.save(user);
+
+		Role role = roleService.findByRoleName("ROLE_ADMIN");
+		AssignRolesDto assignRolesDto = new AssignRolesDto();
+		List<Integer> roleIds = new ArrayList<>();
+
+		roleIds.add(role.getRoleId());
+		assignRolesDto.setRoleIds(roleIds);
+		assignRolesDto.setUserId(user.getUserId());
+
+		assignRolesToUser(assignRolesDto, authentication);
+
+		return user;
 	}
 
 	public LoginResponseDto loginUser(LoginDto loginDto) throws BadCredentialsException {
@@ -113,11 +161,41 @@ public class UserService {
 		return "Uspješno ste promijenili password";
 	}
 
+	public User updateUser(UpdateUserDto updateUserDto, Authentication authentication) throws Exception {
+
+		User user = userRepository.findByUsername(authentication.getName())
+				.orElseThrow(() -> new UsernameNotFoundException("Korisnik nije pronađen."));
+
+		if (Objects.nonNull(updateUserDto.getNewPassword())) {
+			if (!passwordEncoder.matches(updateUserDto.getOldPassword(), user.getPassword())) {
+				throw new Exception("Stari password nije tačan.");
+			}
+			user.setPassword(passwordEncoder.encode(updateUserDto.getNewPassword()));
+		}
+
+		if (userRepository.existsByUsernameAndUserIdNot(updateUserDto.getUsername() + user.getTenantId(),
+				user.getUserId())) {
+			throw new Exception("Postoji korisnik sa unijetim username-om.");
+		}
+
+		if (userRepository.existsByEmailAndUserIdNot(updateUserDto.getEmail(), user.getUserId())) {
+			throw new Exception("Postoji korisnik sa unijetim email-om.");
+		}
+
+		user.setEmail(updateUserDto.getEmail());
+		user.setFirstName(updateUserDto.getFirstName());
+		user.setLastName(updateUserDto.getLastName());
+		user.setUsername(updateUserDto.getUsername() + user.getTenantId());
+
+		return userRepository.save(user);
+
+	}
+
 	@Transactional
 	public String assignRolesToUser(AssignRolesDto assignRolesDto, Authentication authentication) throws Exception {
 
 		boolean hasSuperAdminRole = authentication.getAuthorities().stream()
-				.anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+				.anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
 		if (!hasSuperAdminRole) {
 			throw new Exception("Ovaj korisnik nema ovlaštenje da dodjeluje uloge drugim korisnicima.");
 		}

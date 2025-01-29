@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.babyspa.v1.dtos.AddNewTenantUserDto;
 import com.backend.babyspa.v1.dtos.AssignRolesDto;
 import com.backend.babyspa.v1.dtos.ChangePasswordDto;
 import com.backend.babyspa.v1.dtos.LoginDto;
 import com.backend.babyspa.v1.dtos.LoginResponseDto;
-import com.backend.babyspa.v1.dtos.RegisterUserDto;
+import com.backend.babyspa.v1.dtos.RegisterNewUserDto;
+import com.backend.babyspa.v1.dtos.UpdateUserDto;
 import com.backend.babyspa.v1.models.User;
 import com.backend.babyspa.v1.services.UserService;
 import com.backend.babyspa.v1.utils.ApiResponse;
@@ -29,7 +31,7 @@ public class UserController extends BaseController {
 	UserService userService;
 
 	@PostMapping("/register")
-	public ResponseEntity<ApiResponse<User>> register(@RequestBody RegisterUserDto registerUserDto,
+	public ResponseEntity<ApiResponse<User>> register(@RequestBody RegisterNewUserDto registerNewUserDto,
 			Authentication authentication, BindingResult bindingResult) {
 
 		if (hasErrors(bindingResult)) {
@@ -37,7 +39,24 @@ public class UserController extends BaseController {
 		}
 
 		try {
-			User registerUser = userService.register(registerUserDto, authentication);
+			User registerUser = userService.register(registerNewUserDto, authentication);
+			return createSuccessResponse(registerUser);
+		} catch (Exception e) {
+			return createExceptionResponse(e);
+		}
+
+	}
+
+	@PostMapping("/add-new-tenant")
+	public ResponseEntity<ApiResponse<User>> addNewTenant(@RequestBody AddNewTenantUserDto addNewTenantUserDto,
+			Authentication authentication, BindingResult bindingResult) {
+
+		if (hasErrors(bindingResult)) {
+			return createErrorResponse(bindingResult);
+		}
+
+		try {
+			User registerUser = userService.addNewTenantUser(addNewTenantUserDto, authentication);
 			return createSuccessResponse(registerUser);
 		} catch (Exception e) {
 			return createExceptionResponse(e);
@@ -68,6 +87,17 @@ public class UserController extends BaseController {
 
 		try {
 			return createSuccessResponse(userService.changePassword(changePasswordDto, authentication));
+		} catch (Exception e) {
+			return createExceptionResponse(e);
+		}
+	}
+
+	@PutMapping("/update")
+	public ResponseEntity<ApiResponse<User>> update(@RequestBody UpdateUserDto updateUserDto,
+			Authentication authentication) {
+
+		try {
+			return createSuccessResponse(userService.updateUser(updateUserDto, authentication));
 		} catch (Exception e) {
 			return createExceptionResponse(e);
 		}

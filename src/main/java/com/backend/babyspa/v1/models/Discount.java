@@ -38,10 +38,11 @@ public class Discount {
 	@Column(name = "tenant_id", nullable = true)
 	private String tenantId;
 
-	public Discount(BigDecimal value, boolean isPrecentage, String discountName) {
+	public Discount(BigDecimal value, boolean isPrecentage, String discountName, String tenantId) {
 		this.value = value;
 		this.isPrecentage = isPrecentage;
 		this.discountName = discountName;
+		this.tenantId = tenantId;
 	}
 
 }

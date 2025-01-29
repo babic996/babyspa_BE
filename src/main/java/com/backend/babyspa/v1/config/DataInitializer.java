@@ -77,18 +77,18 @@ public class DataInitializer implements CommandLineRunner {
 		}
 
 		if (discountRepository.count() == 0) {
-			discountRepository.save(new Discount(BigDecimal.valueOf(20), false, "20KM"));
-			discountRepository.save(new Discount(BigDecimal.valueOf(30), false, "30KM"));
-			discountRepository.save(new Discount(BigDecimal.valueOf(50), false, "50KM"));
-			discountRepository.save(new Discount(BigDecimal.valueOf(20), true, "20%"));
-			discountRepository.save(new Discount(BigDecimal.valueOf(30), true, "30%"));
-			discountRepository.save(new Discount(BigDecimal.valueOf(40), true, "40%"));
-			discountRepository.save(new Discount(BigDecimal.valueOf(50), true, "50%"));
+			discountRepository.save(new Discount(BigDecimal.valueOf(20), false, "20KM", "sunshine"));
+			discountRepository.save(new Discount(BigDecimal.valueOf(30), false, "30KM", "sunshine"));
+			discountRepository.save(new Discount(BigDecimal.valueOf(50), false, "50KM", "sunshine"));
+			discountRepository.save(new Discount(BigDecimal.valueOf(20), true, "20%", "sunshine"));
+			discountRepository.save(new Discount(BigDecimal.valueOf(30), true, "30%", "sunshine"));
+			discountRepository.save(new Discount(BigDecimal.valueOf(40), true, "40%", "sunshine"));
+			discountRepository.save(new Discount(BigDecimal.valueOf(50), true, "50%", "sunshine"));
 		}
 
 		if (paymentTypeRepository.count() == 0) {
-			paymentTypeRepository.save(new PaymentType("Gotovinski", "cash"));
-			paymentTypeRepository.save(new PaymentType("Poklon bon", "gift"));
+			paymentTypeRepository.save(new PaymentType("Gotovinski", "cash", "sunshine"));
+			paymentTypeRepository.save(new PaymentType("Poklon bon", "gift", "sunshine"));
 		}
 
 		if (roleRepository.count() == 0) {
@@ -103,16 +103,17 @@ public class DataInitializer implements CommandLineRunner {
 
 		if (userRepository.count() == 0) {
 
-			User user = new User("user@mail", "user@sunshine", passwordEncoder.encode("user123456"), "User",
-					"Sunshine");
+			User user = new User("user@mail", "user@sunshine", passwordEncoder.encode("user123456"), "User", "Sunshine",
+					"sunshine");
 			userRepository.save(user);
 			Role role = roleRepository.findByRoleName("ROLE_SUPER_ADMIN").orElseThrow(() -> new NotFoundException(
-					"Ne može se pronaći uloga SUPER_ADMIN prilikom kreiranja inicijalnog korisnika"));
+					"Ne može se pronaći uloga SUPER ADMIN prilikom kreiranja inicijalnog korisnika"));
 			UserRole userRole = new UserRole();
 			userRole.setRole(role);
 			userRole.setUser(user);
 			userRole.setUserRoleKey(new UserRoleKey(user.getUserId(), role.getRoleId()));
 			userRoleRepository.save(userRole);
+
 		}
 
 	}

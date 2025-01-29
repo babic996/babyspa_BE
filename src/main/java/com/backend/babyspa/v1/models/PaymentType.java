@@ -33,9 +33,10 @@ public class PaymentType {
 	@Column(name = "tenant_id", nullable = true)
 	private String tenantId;
 
-	public PaymentType(String paymentTypeName, String paymentTypeCode) {
+	public PaymentType(String paymentTypeName, String paymentTypeCode, String tenantId) {
 		this.paymentTypeName = paymentTypeName;
 		this.paymentTypeCode = paymentTypeCode;
+		this.tenantId = tenantId;
 	}
 
 }

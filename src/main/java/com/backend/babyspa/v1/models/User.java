@@ -42,12 +42,13 @@ public class User {
 	@Column(name = "tenant_id", nullable = true)
 	private String tenantId;
 
-	public User(String email, String username, String password, String firstName, String lastName) {
+	public User(String email, String username, String password, String firstName, String lastName, String tenantId) {
 
 		this.email = email;
 		this.username = username;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.tenantId = tenantId;
 	}
 }

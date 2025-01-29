@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,4 +45,12 @@ public class ServicePackage {
 
 	@Column(name = "tenant_id", nullable = true)
 	private String tenantId;
+
+	@ManyToOne
+	@JoinColumn(name = "created_by_user_id", referencedColumnName = "user_id", nullable = true)
+	private User createdByUser;
+
+	@ManyToOne
+	@JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", nullable = true)
+	private User updatedByUser;
 }

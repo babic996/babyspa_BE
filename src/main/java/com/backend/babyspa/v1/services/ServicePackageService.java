@@ -18,6 +18,7 @@ import com.backend.babyspa.v1.exceptions.NotFoundException;
 import com.backend.babyspa.v1.models.ServicePackage;
 import com.backend.babyspa.v1.repositories.ArrangementRepository;
 import com.backend.babyspa.v1.repositories.ServicePackageRepository;
+import com.backend.babyspa.v1.utils.SecurityUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -51,6 +52,7 @@ public class ServicePackageService {
 		servicePackage.setServicePackageDurationDays(createServicePackageDto.getServicePackageDurationDays());
 		servicePackage.setTermNumber(createServicePackageDto.getTermNumber());
 		servicePackage.setNote(createServicePackageDto.getNote());
+		servicePackage.setCreatedByUser(SecurityUtil.getCurrentUser());
 
 		return servicePackageRepository.save(servicePackage);
 	}
@@ -72,6 +74,7 @@ public class ServicePackageService {
 
 		servicePackage.setPrice(updateServicePackageDto.getPrice());
 		servicePackage.setNote(updateServicePackageDto.getNote());
+		servicePackage.setUpdatedByUser(SecurityUtil.getCurrentUser());
 
 		return servicePackageRepository.save(servicePackage);
 	}

@@ -22,6 +22,7 @@ import com.backend.babyspa.v1.models.Reservation;
 import com.backend.babyspa.v1.models.ServicePackage;
 import com.backend.babyspa.v1.models.Status;
 import com.backend.babyspa.v1.repositories.ReservationRepository;
+import com.backend.babyspa.v1.utils.SecurityUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -99,6 +100,7 @@ public class ReservationService {
 				createReservationDto.getStartDate().plusMinutes(createReservationDto.getDurationReservation()));
 		reservation.setStatus(status);
 		reservation.setNote(createReservationDto.getNote());
+		reservation.setCreatedByUser(SecurityUtil.getCurrentUser());
 		arrangementService.decreaseRemainingTerm(arrangement);
 
 		reservationRepository.save(reservation);
@@ -130,6 +132,7 @@ public class ReservationService {
 		}
 
 		reservation.setNote(updateReservationDto.getNote());
+		reservation.setUpdatedByUser(SecurityUtil.getCurrentUser());
 
 		reservationRepository.save(reservation);
 

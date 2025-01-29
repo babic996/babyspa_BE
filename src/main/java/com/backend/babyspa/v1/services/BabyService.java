@@ -20,6 +20,7 @@ import com.backend.babyspa.v1.models.Baby;
 import com.backend.babyspa.v1.repositories.ArrangementRepository;
 import com.backend.babyspa.v1.repositories.BabyRepository;
 import com.backend.babyspa.v1.utils.DateTimeUtil;
+import com.backend.babyspa.v1.utils.SecurityUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -55,6 +56,7 @@ public class BabyService {
 		baby.setNote(createBabyDto.getNote());
 		baby.setNumberOfMonths(createBabyDto.getNumberOfMonths());
 		baby.setPhoneNumber(createBabyDto.getPhoneNumber());
+		baby.setCreatedByUser(SecurityUtil.getCurrentUser());
 
 		return babyRepository.save(baby);
 	}
@@ -75,6 +77,7 @@ public class BabyService {
 		baby.setNote(updateBabyDto.getNote());
 		baby.setNumberOfMonths(updateBabyDto.getNumberOfMonths());
 		baby.setPhoneNumber(updateBabyDto.getPhoneNumber());
+		baby.setUpdatedByUser(SecurityUtil.getCurrentUser());
 
 		return babyRepository.save(baby);
 

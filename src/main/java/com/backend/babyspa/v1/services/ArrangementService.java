@@ -29,6 +29,7 @@ import com.backend.babyspa.v1.models.Status;
 import com.backend.babyspa.v1.repositories.ArrangementRepository;
 import com.backend.babyspa.v1.repositories.ReservationRepository;
 import com.backend.babyspa.v1.utils.DateTimeUtil;
+import com.backend.babyspa.v1.utils.SecurityUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -96,6 +97,7 @@ public class ArrangementService {
 		arrangement.setRemainingTerm(servicePackage.getTermNumber());
 		arrangement.setServicePackage(servicePackage);
 		arrangement.setStatus(status);
+		arrangement.setCreatedByUser(SecurityUtil.getCurrentUser());
 
 		return arrangementRepository.save(arrangement);
 	}
@@ -154,6 +156,7 @@ public class ArrangementService {
 		arrangement.setNote(updateArrangementDto.getNote());
 		arrangement.setStatus(status);
 		arrangement.setExtendDurationDays(updateArrangementDto.getExtendDurationDays());
+		arrangement.setUpdatedByUser(SecurityUtil.getCurrentUser());
 
 		arrangementRepository.save(arrangement);
 		return buildFindAllArrangementDtoFromArrangement(arrangement);

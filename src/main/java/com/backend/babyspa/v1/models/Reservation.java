@@ -50,4 +50,12 @@ public class Reservation {
 	@ManyToOne
 	@JoinColumn(name = "status_id", nullable = false)
 	private Status status;
+
+	@ManyToOne
+	@JoinColumn(name = "created_by_user_id", referencedColumnName = "user_id", nullable = true)
+	private User createdByUser;
+
+	@ManyToOne
+	@JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", nullable = true)
+	private User updatedByUser;
 }
