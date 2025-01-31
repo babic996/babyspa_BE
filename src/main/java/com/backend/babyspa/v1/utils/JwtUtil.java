@@ -62,6 +62,7 @@ public class JwtUtil {
 		List<String> userRoles = userRoleRepository.findByUser(user).stream()
 				.map(e -> e.getRole().getRoleName().substring(5)).collect(Collectors.toList());
 		claims.put("userId", user.getUserId());
+		claims.put("email", user.getEmail());
 		claims.put("firstName", user.getFirstName());
 		claims.put("lastName", user.getLastName());
 		claims.put("role", userRoles);

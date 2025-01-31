@@ -1,5 +1,7 @@
 package com.backend.babyspa.v1.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,10 @@ public class RoleService {
 
 		return roleRepository.findByRoleName(roleName)
 				.orElseThrow(() -> new NotFoundException("Nije pronađena uloga sa nazivom: " + roleName + "!"));
+	}
+
+	public List<Role> findAll() {
+		return roleRepository.findAll();
 	}
 
 }

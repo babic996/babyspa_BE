@@ -25,14 +25,10 @@ public class UpdateUserDto {
 	@Pattern(regexp = "^(?! ).*", message = "Unijeli ste prvo razmak pa prezime")
 	private String lastName;
 
-	@NotNull(message = "Morate unijeti password")
-	@NotBlank(message = "Poslali ste samo razmake")
 	@Pattern(regexp = "^(?! ).*", message = "Unijeli ste prvo razmak pa password")
 	@Size(min = 8, message = "Password mora imati najmanje 8 karaktera")
 	private String oldPassword;
 
-	@NotNull(message = "Morate unijeti password")
-	@NotBlank(message = "Poslali ste samo razmake")
 	@Pattern(regexp = "^(?! ).*", message = "Unijeli ste prvo razmak pa password")
 	@Size(min = 8, message = "Password mora imati najmanje 8 karaktera")
 	private String newPassword;

@@ -24,6 +24,7 @@ import com.backend.babyspa.v1.dtos.LoginDto;
 import com.backend.babyspa.v1.dtos.LoginResponseDto;
 import com.backend.babyspa.v1.dtos.RegisterNewUserDto;
 import com.backend.babyspa.v1.dtos.UpdateUserDto;
+import com.backend.babyspa.v1.dtos.UserInfoDto;
 import com.backend.babyspa.v1.exceptions.NotFoundException;
 import com.backend.babyspa.v1.models.Role;
 import com.backend.babyspa.v1.models.User;
@@ -65,6 +66,20 @@ public class UserService {
 				.orElseThrow(() -> new NotFoundException("Nije pronađen korisnik čiji je ID: " + userId + "!"));
 	}
 
+	public UserInfoDto findUserInfoByUserId(int userId) throws NotFoundException {
+
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new NotFoundException("Nije pronađen korisnik čiji je ID: " + userId + "!"));
+
+		UserInfoDto userInfoDto = new UserInfoDto();
+		userInfoDto.setEmail(user.getEmail());
+		userInfoDto.setFirstName(user.getFirstName());
+		userInfoDto.setLastName(user.getLastName());
+		userInfoDto.setUsername(user.getUsername().split("@")[0]);
+
+		return userInfoDto;
+	}
+
 	public User findByUsername(String username) throws NotFoundException {
 
 		return userRepository.findByUsername(username)
@@ -73,10 +88,12 @@ public class UserService {
 
 	public User register(RegisterNewUserDto registerNewUserDto, Authentication authentication) throws Exception {
 
-		boolean hasSuperAdminRole = authentication.getAuthorities().stream()
-				.anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-		if (!hasSuperAdminRole) {
-			throw new Exception("Ovaj korisnik nema ovlaštenje da dodjeluje uloge drugim korisnicima.");
+		boolean hasPermission = authentication.getAuthorities().stream()
+				.anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN")
+						|| authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+
+		if (!hasPermission) {
+			throw new Exception("Ovaj korisnik nema ovlaštenje da kreira naloge.");
 		}
 
 		User user = new User();
@@ -92,7 +109,7 @@ public class UserService {
 		user.setEmail(registerNewUserDto.getEmail());
 		user.setFirstName(registerNewUserDto.getFirstName());
 		user.setLastName(registerNewUserDto.getLastName());
-		user.setUsername(registerNewUserDto.getUsername() + TenantContext.getTenant());
+		user.setUsername(registerNewUserDto.getUsername() + "@" + TenantContext.getTenant());
 		user.setPassword(passwordEncoder.encode(registerNewUserDto.getPassword()));
 
 		return userRepository.save(user);
@@ -102,9 +119,9 @@ public class UserService {
 	public User addNewTenantUser(AddNewTenantUserDto addNewTenantUserDto, Authentication authentication)
 			throws Exception {
 
-		boolean hasSuperAdminRole = authentication.getAuthorities().stream()
+		boolean hasPermission = authentication.getAuthorities().stream()
 				.anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
-		if (!hasSuperAdminRole) {
+		if (!hasPermission) {
 			throw new Exception("Ovaj korisnik nema ovlaštenje da dodaje nove tenante.");
 		}
 
@@ -191,7 +208,7 @@ public class UserService {
 		user.setEmail(updateUserDto.getEmail());
 		user.setFirstName(updateUserDto.getFirstName());
 		user.setLastName(updateUserDto.getLastName());
-		user.setUsername(updateUserDto.getUsername() + user.getTenantId());
+		user.setUsername(updateUserDto.getUsername() + "@" + user.getTenantId());
 
 		return userRepository.save(user);
 

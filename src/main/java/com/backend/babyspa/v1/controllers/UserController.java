@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.babyspa.v1.dtos.AddNewTenantUserDto;
@@ -17,6 +19,7 @@ import com.backend.babyspa.v1.dtos.LoginDto;
 import com.backend.babyspa.v1.dtos.LoginResponseDto;
 import com.backend.babyspa.v1.dtos.RegisterNewUserDto;
 import com.backend.babyspa.v1.dtos.UpdateUserDto;
+import com.backend.babyspa.v1.dtos.UserInfoDto;
 import com.backend.babyspa.v1.models.User;
 import com.backend.babyspa.v1.services.UserService;
 import com.backend.babyspa.v1.utils.ApiResponse;
@@ -30,8 +33,28 @@ public class UserController extends BaseController {
 	@Autowired
 	UserService userService;
 
+	@GetMapping("/find-by-id")
+	public ResponseEntity<ApiResponse<User>> findById(@RequestParam int userId) {
+
+		try {
+			return createSuccessResponse(userService.findById(userId));
+		} catch (Exception e) {
+			return createExceptionResponse(e);
+		}
+	}
+
+	@GetMapping("/find-user-info-by-id")
+	public ResponseEntity<ApiResponse<UserInfoDto>> findUserInfoByUserId(@RequestParam int userId) {
+
+		try {
+			return createSuccessResponse(userService.findUserInfoByUserId(userId));
+		} catch (Exception e) {
+			return createExceptionResponse(e);
+		}
+	}
+
 	@PostMapping("/register")
-	public ResponseEntity<ApiResponse<User>> register(@RequestBody RegisterNewUserDto registerNewUserDto,
+	public ResponseEntity<ApiResponse<User>> register(@RequestBody @Valid RegisterNewUserDto registerNewUserDto,
 			Authentication authentication, BindingResult bindingResult) {
 
 		if (hasErrors(bindingResult)) {
@@ -93,8 +116,12 @@ public class UserController extends BaseController {
 	}
 
 	@PutMapping("/update")
-	public ResponseEntity<ApiResponse<User>> update(@RequestBody UpdateUserDto updateUserDto,
-			Authentication authentication) {
+	public ResponseEntity<ApiResponse<User>> update(@RequestBody @Valid UpdateUserDto updateUserDto,
+			Authentication authentication, BindingResult bindingResult) {
+
+		if (hasErrors(bindingResult)) {
+			return createErrorResponse(bindingResult);
+		}
 
 		try {
 			return createSuccessResponse(userService.updateUser(updateUserDto, authentication));
