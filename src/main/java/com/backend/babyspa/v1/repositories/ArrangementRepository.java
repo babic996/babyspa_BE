@@ -62,7 +62,7 @@ public interface ArrangementRepository extends JpaRepository<Arrangement, Intege
 			AND (:servicePackageId IS NULL OR sp.service_package_id = :servicePackageId)
 			AND (:startPrice IS NULL OR :endPrice IS NULL OR a.price BETWEEN :startPrice AND :endPrice)
 			AND (:remainingTerm IS NULL OR a.remaining_term = :remainingTerm)
-			AND (created_at >= :startDate AND created_at <= :endDate)
+			AND (a.created_at >= :startDate AND a.created_at <= :endDate)
 			AND (a.tenant_id = :tenantId)
 			ORDER BY a.arrangement_id DESC
 			""", nativeQuery = true)
