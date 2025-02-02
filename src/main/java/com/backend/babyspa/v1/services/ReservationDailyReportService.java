@@ -27,7 +27,7 @@ public class ReservationDailyReportService {
 	BabyService babyService;
 
 	@Transactional
-	public ReservationDailyReport save(ReservationDailyReportDto reservationDailyReportDto) {
+	public ReservationDailyReport save(ReservationDailyReportDto reservationDailyReportDto, String tenantId) {
 
 		ReservationDailyReport reservationDailyReport = new ReservationDailyReport();
 
@@ -37,6 +37,7 @@ public class ReservationDailyReportService {
 		reservationDailyReport.setNumberOfReservation(reservationDailyReportDto.getNumberOfReservation());
 		reservationDailyReport.setDate(reservationDailyReportDto.getDate());
 		reservationDailyReport.setBaby(babyService.findById(reservationDailyReportDto.getBabyId()));
+		reservationDailyReport.setTenantId(tenantId);
 
 		return reservationDailyReportRepository.save(reservationDailyReport);
 	}

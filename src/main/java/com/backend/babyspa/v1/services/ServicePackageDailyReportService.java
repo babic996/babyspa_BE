@@ -24,7 +24,7 @@ public class ServicePackageDailyReportService {
 	ServicePackageDailyReportRepository servicePackageDailyReportRepository;
 
 	@Transactional
-	public ServicePackageDailyReport save(ServicePackageDailyReportDto servicePackageDailyReportDto) {
+	public ServicePackageDailyReport save(ServicePackageDailyReportDto servicePackageDailyReportDto, String tenantId) {
 
 		ServicePackageDailyReport servicePackageDailyReport = new ServicePackageDailyReport();
 
@@ -33,6 +33,7 @@ public class ServicePackageDailyReportService {
 		}
 		servicePackageDailyReport.setNumberOfUsedPackages(servicePackageDailyReportDto.getNumberOfUsedPackages());
 		servicePackageDailyReport.setDate(servicePackageDailyReportDto.getDate());
+		servicePackageDailyReport.setTenantId(tenantId);
 
 		return servicePackageDailyReportRepository.save(servicePackageDailyReport);
 	}

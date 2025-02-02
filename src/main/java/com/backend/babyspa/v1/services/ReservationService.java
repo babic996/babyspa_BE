@@ -193,7 +193,7 @@ public class ReservationService {
 						reservationDailyReportDto.setBabyId(((Number) useges[1]).intValue());
 						reservationDailyReportDto.setNumberOfReservation(((Number) useges[0]).intValue());
 						reservationDailyReportDto.setStatus(status);
-						reservationDailyReportService.save(reservationDailyReportDto);
+						reservationDailyReportService.save(reservationDailyReportDto, tenantId);
 					});
 				}
 			});
@@ -229,7 +229,7 @@ public class ReservationService {
 				servicePackageDailyReportDto.setNumberOfUsedPackages(usedPackages);
 				servicePackageDailyReportDto.setDate(date);
 				servicePackageDailyReportDto.setServicePackage(servicePackage);
-				servicePackageDailyReportService.save(servicePackageDailyReportDto);
+				servicePackageDailyReportService.save(servicePackageDailyReportDto, tenantId);
 			});
 		}
 	}
